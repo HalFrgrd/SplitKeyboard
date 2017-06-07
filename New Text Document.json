@@ -1,0 +1,255 @@
+[
+  {
+    "background": {
+      "name": "PBT WAN",
+      "style": "background-image: url('/bg/plastic/pbt-wan.png');"
+    },
+    "radii": "10px",
+    "switchMount": "cherry"
+  },
+  [
+    {
+      "c": "#f7f2ea",
+      "a": 6
+    },
+    "Esc",
+    {
+      "a": 7
+    },
+    "",
+    {
+      "a": 6
+    },
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    {
+      "x": 1.75
+    },
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12",
+    {
+      "a": 7
+    },
+    "<i class='fa fa-volume-down'></i>",
+    "<i class='fa fa-volume-up'></i>",
+    "<i class='fa fa-volume-off'></i>"
+  ],
+  [
+    "",
+    {
+      "a": 4
+    },
+    "~\n`",
+    "!\n1",
+    "@\n2",
+    "#\n3",
+    "$\n4",
+    "%\n5",
+    "^\n6",
+    {
+      "x": 1.75
+    },
+    "&\n7",
+    "*\n8",
+    "(\n9",
+    ")\n0",
+    "_\n-",
+    "+\n=",
+    {
+      "a": 6,
+      "w": 2
+    },
+    "Backspace",
+    {
+      "a": 5
+    },
+    "Delete\nInsert"
+  ],
+  [
+    {
+      "a": 7
+    },
+    "",
+    {
+      "a": 4,
+      "w": 1.5
+    },
+    "Tab",
+    "Q",
+    "W",
+    "E",
+    "R",
+    "T",
+    {
+      "x": 1.75
+    },
+    "Y",
+    {
+      "t": "#000000\n\n\n\n\n\n\n\n\n\n#a1a1a1"
+    },
+    "U\n\n\n\n\n\n\n\n\n\nScroll Up",
+    "I\n\n\n\n\n\n\n\n\n\n<i class='kb kb-Arrows-Up'></i>",
+    {
+      "t": "#000000"
+    },
+    "O",
+    "P",
+    "{\n[",
+    "}\n]",
+    {
+      "w": 1.5
+    },
+    "|\n\\",
+    {
+      "a": 5
+    },
+    "PrtSc\nNmLk"
+  ],
+  [
+    {
+      "a": 7
+    },
+    "",
+    {
+      "t": "#000000\n#a1a1a1",
+      "a": 4,
+      "w": 1.75
+    },
+    "Caps Lock\nMouse",
+    {
+      "t": "#000000"
+    },
+    "A",
+    {
+      "t": "#000000\n\n\n\n\n\n\n\n\n\n#a1a1a1"
+    },
+    "S\n\n\n\n\n\n\n\n\n\nRight Click",
+    "D\n\n\n\n\n\n\n\n\n\nMiddle Click",
+    "F\n\n\n\n\n\n\n\n\n\nLeft Click",
+    {
+      "t": "#000000"
+    },
+    "G",
+    {
+      "x": 1.75,
+      "t": "#000000\n\n\n\n\n\n\n\n\n\n#a1a1a1"
+    },
+    "H\n\n\n\n\n\n\n\n\n\nScroll Down",
+    "J\n\n\n\n\n\n\n\n\n\n<i class='kb kb-Arrows-Left'></i>",
+    "K\n\n\n\n\n\n\n\n\n\n<i class='kb kb-Arrows-Down'></i>",
+    "L\n\n\n\n\n\n\n\n\n\n<i class='kb kb-Arrows-Right'></i>",
+    {
+      "t": "#000000"
+    },
+    ":\n;",
+    "\"\n'",
+    {
+      "a": 6,
+      "w": 2.25
+    },
+    "Enter",
+    {
+      "a": 7,
+      "h": 2
+    },
+    ""
+  ],
+  [
+    "Click",
+    {
+      "a": 6,
+      "w": 2.25
+    },
+    "Shift",
+    {
+      "a": 4
+    },
+    "Z",
+    "X",
+    "C",
+    "V",
+    "B",
+    {
+      "x": 1.75
+    },
+    "N",
+    "M",
+    "<\n,",
+    ">\n.",
+    "?\n/",
+    {
+      "a": 6,
+      "w": 1.75
+    },
+    "Shift",
+    {
+      "a": 5
+    },
+    "\nM\n\n\n\n\n↑"
+  ],
+  [
+    {
+      "a": 6,
+      "w": 2
+    },
+    "Ctrl",
+    {
+      "w": 1.25
+    },
+    "Windows",
+    {
+      "w": 1.25
+    },
+    "Alt",
+    {
+      "a": 5,
+      "w": 1.25
+    },
+    "←\nHome",
+    {
+      "t": "#000000\n\n\n\n\n\n\n\n\n\n#a1a1a1",
+      "a": 4,
+      "w": 2.75
+    },
+    "\n\n\n\n\n\nSpace\n\n\n\nAccelerate",
+    {
+      "x": 1.75,
+      "t": "#000000"
+    },
+    "\nPgUp\n\n\n\n\n\n\n↑",
+    "\nPgDwn\n\n\n\n\n\n\n↓",
+    {
+      "a": 5
+    },
+    "→\nEnd",
+    {
+      "a": 6,
+      "w": 1.25
+    },
+    "Fn",
+    {
+      "w": 1.25
+    },
+    "Meta",
+    {
+      "a": 7
+    },
+    "←",
+    {
+      "a": 5
+    },
+    "\nM\n\n\n\n\n↓",
+    {
+      "a": 7
+    },
+    "→"
+  ]
+]
