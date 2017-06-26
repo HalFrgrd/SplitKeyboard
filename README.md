@@ -109,7 +109,7 @@ The way I generated the files for my split keyboard was by making a normal unspl
 
 I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
 1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
-![splitline](/explanationImages/makingSplit.svg)
+![splitline](https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg)
 2. Adding more mount holes. I needed some more as I essentially cutout a segment between where the Arduino and the TRS jack.
 ![mountholes](./explanationImages/moremount.svg)
 3. Adding little pockets for the magnets to fit in. I chose to have 6 magnets in pocket so that I would use all of the magnets that I bought. The magnets were to sit in the three middle layers, so I didn't modify the bottom and top layers for this step:
@@ -118,7 +118,19 @@ I saved the files as SVG files as I knew how to edit them on Inkscape. The modif
 ![cutouts](./explanationImages/cutouts.svg)
 
 
-wip for the actual pictures and further steps.
+#### Putting it together
+I would follow [Matt3o's guide](https://deskthority.net/workshop-f7/brownfox-step-by-step-t6050.html) for the soldering of the switches.
+Notes from this guide:
+  * Use lots of hot glue when you secure the switches down because if you are pulling off keycaps, you don't want to pull off the key switch with it.
+  * The orientation of the switches doesn't matter at all which comes in handy when you want to fit in a TRS jack. As the TRS jacks were quite tall they would have caused some got the switches to be pushed back up as there wasn't enough room for both the switches ans the jack. I had to cut part of the bottoms off two switches and rotate them a bit so that everything fitted in the case. There is quite a lot of unused space in the switches so you can cut nearly all the bottom plastic housing off without compromising functionality.
+  * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case.
+  * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar.
+  * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section.
+
 
 ### Custom firmware 
-wip
+
+I used qmk for the firmware. The installation is well documented on the qmk github and website. Its very easy to use of you are using a kit as there are all the common kits (ergodox, let's split). If you have an unsplit keyboard you can use their.        . But if you have a fully custom split, I would recommend modifying the let's split folder as I couldn't figure out how to add split functionality to the blank keymap. When modifying the let's split firmware there are a few files you need to edit:
+
+
+When flashing the firmware onto the Arduino's, they must in "bootloader mode". The Arduino's can either run the program on them, or be in a mode where they rewrite their memory using whatever the computer passes them; this is bootloader mode. When you first buy an Arduino, they are in bootloader mode but when you want to re-flash them they need to be put back into bootloader mode. This is done by quickly connecting the RESET and GROUND pins. Some people to connect these pins to a small button and have that on the outside of the case. I chose to have two wires protruding through the LED slot on a switch. This is  a so that I can take the keycap off, and quickly connect the two wires. Much easier than having to disassemble the case to get to the Arduino. I re-flash my Arduino's around 20 times so it's worth considering how you will short the two pins.
