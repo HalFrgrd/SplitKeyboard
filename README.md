@@ -110,11 +110,11 @@ The way I generated the files for my split keyboard was by making a normal unspl
 I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
 1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
 
-![splitline](https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg)
+![splitline](./explanationImages/makingSplit.png)
 
 2. Adding more mount holes. I needed some more as I essentially cutout a segment between where the Arduino and the TRS jack.
 
-![mountholes](./explanationImages/moremount.svg)
+![mountholes](./explanationImages/moremount.png)
 
 3. Adding little pockets for the magnets to fit in. I chose to have 6 magnets in pocket so that I would use all of the magnets that I bought. The magnets were to sit in the three middle layers, so I didn't modify the bottom and top layers for this step:
 
@@ -122,7 +122,7 @@ I saved the files as SVG files as I knew how to edit them on Inkscape. The modif
 
 4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so modified all three middle layers.
 
-![cutouts](./explanationImages/cutouts.svg)
+![cutouts](./explanationImages/cutouts.png)
 
 
 #### Putting it together
@@ -137,7 +137,29 @@ Notes from this guide:
 
 ### Custom firmware 
 
-I used qmk for the firmware. The installation is well documented on the qmk github and website. Its very easy to use of you are using a kit as there are all the common kits (ergodox, let's split). If you have an unsplit keyboard you can use their.        . But if you have a fully custom split, I would recommend modifying the let's split folder as I couldn't figure out how to add split functionality to the blank keymap. When modifying the let's split firmware there are a few files you need to edit:
+I used QMK for the firmware. The installation is well documented on the QMK GitHub and website. It's very easy to use of you are using a kit as there are all the common kits (Ergodox, Let's Split). If you have an unsplit keyboard you can run the following command from root to get a new project setup:
+
+> `$ ./util/new_project.sh nameofnewproject`
+
+But if you have a fully custom split, I would recommend modifying the Let's Split folder as I couldn't figure out how to add split functionality to the blank keymap. When modifying the Let's Split firmware there are a few files you need to edit:
+
+  * /lets_split/keymaps/copyanotherkeymapfolder/config.h
+    Here you can use `#define USE_SERIAL` or `#define USE_I2C`
+  * /lets_split/keymaps/copyanotherkeymapfolder/keymap.c
+    This is where you get to define all the layers you will have on your keyboard and what all the keys do.
+  * /lets_split/rev2/config.h
+    Edit the `#define MANUFACTURER` and other definitions to whatever you like
+    > `#define MATRIX_ROWS` should be the number of total rows. e.g. 5 in the left and 7 in right would mean `#define MATRIX_ROWS 12`
+    > `#define MATRIX_COLUMNS` should be the number of total columns. e.g. 6 in the left and 7 in right would mean `#define MATRIX_COLUMNS 13`
+    I used seperate pins in each half so when I built the firmware for the left side I would uncomment the first two lines and comment the last two:
+    > `// #define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2} //leftside
+    > // #define MATRIX_COL_PINS { D1, D4, C6, D7, E6, B4, B5, B6, F4 } //leftside
+    >
+    > #define MATRIX_ROW_PINS { D1, F4, F5, F6, F7, B1} //rightside
+    > #define MATRIX_COL_PINS { B3, B2, B6, B5, B4, E6, D7, C6, D4 } //rightside`
+  * /lets_split/rev2/rev2.h
+    This file has definitions about the layout of the keyboard so that the keymap file can be used. The main thing to do is to change the definitions for KEYMAP or KC_KEYMAP so that it matches your layout (i.e. the correct number of rows and columns) or you will get errors when building.
+
 
 
 When flashing the firmware onto the Arduino's, they must in "bootloader mode". The Arduino's can either run the program on them, or be in a mode where they rewrite their memory using whatever the computer passes them; this is bootloader mode. When you first buy an Arduino, they are in bootloader mode but when you want to re-flash them they need to be put back into bootloader mode. This is done by quickly connecting the RESET and GROUND pins. Some people to connect these pins to a small button and have that on the outside of the case. I chose to have two wires protruding through the LED slot on a switch. This is  a so that I can take the keycap off, and quickly connect the two wires. Much easier than having to disassemble the case to get to the Arduino. I re-flash my Arduino's around 20 times so it's worth considering how you will short the two pins.
