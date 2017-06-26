@@ -13,7 +13,7 @@ These are the ways I learnt it could be done:
   * Having a controller (Teensy or an Arduino in one half) and an IO expander in the other half.
   * Having two controllers, one in each half which communicate via one of two protocols:
     * Serial or
-	  * I2C
+	 * I2C
   * One controller and a bunch of wires between the halves
 
 Controller + IO expander: The way the wiring works is that each row and each column is wired individually to a pin on somekind of controller. Say you have a controller with 20 available pins, your keyboard can have at most 100 keys as you can have 10 rows and 10 columns. If you want more keys, you use and IO expander. An IO expander has a bunch of pins for wiring the rows and columns to and a few special pins that are wired to the controller. This special pin condenses all the other pins and can pass all the information from the pins to the controller. So you can have a controller in one half and an IO expander in the other and have a only a few wires between the two halves.
@@ -104,15 +104,18 @@ This was my favourite part of the process. Explore the subreddits, forums, and P
 11. Line Color: I didn't bother with this as I was going to edit the files afterwards. Some laser cutters use specific colours to know when to cut and when to engrave.
 12. Line Weight: Some laser cutters will see the line as rectangle that needs multiple passes if the line is too thick. I left this blank as I was going to edit the files after. 
 
-Before the editing my designs looked like this:
-wip
 
 The way I generated the files for my split keyboard was by making a normal unsplit keyboard on KLE and on SwillKB Builder. I then used Inkscape to manually put in a line where I wanted the split to be. This way I could get a nice interlocking split keyboard.
 
-I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications that I will get around to writing about more were: creating a line down the middle; usb cutouts, trs jack cutouts.
-
-After the editing:
-wip
+I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
+1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
+[splitline](explanationImages/makingSplit.svg)
+2. Adding more mount holes. I needed some more as I essentially cutout a segment between where the Arduino and the TRS jack.
+[mountholes](explanationImages/moremount.svg)
+3. Adding little pockets for the magnets to fit in. I chose to have 6 magnets in pocket so that I would use all of the magnets that I bought. The magnets were to sit in the three middle layers, so I didn't modify the bottom and top layers for this step:
+[magnets](explanationImages/magnets.svg)
+4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so modified all three middle layers.
+[cutouts](explanationImages/cutouts.svg)
 
 
 wip for the actual pictures and further steps.
