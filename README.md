@@ -109,12 +109,20 @@ The way I generated the files for my split keyboard was by making a normal unspl
 
 I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
 1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
-![splitline](https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg)
+<a>
+  <img src="https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg" width="100%" height="144">
+</a>
+
 2. Adding more mount holes. I needed some more as I essentially cutout a segment between where the Arduino and the TRS jack.
+
 ![mountholes](./explanationImages/moremount.svg)
+
 3. Adding little pockets for the magnets to fit in. I chose to have 6 magnets in pocket so that I would use all of the magnets that I bought. The magnets were to sit in the three middle layers, so I didn't modify the bottom and top layers for this step:
+
 ![magnets](./explanationImages/magnets.svg)
+
 4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so modified all three middle layers.
+
 ![cutouts](./explanationImages/cutouts.svg)
 
 
@@ -126,7 +134,7 @@ Notes from this guide:
   * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case.
   * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar.
   * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section.
-
+  * I was using magnets in the 
 
 ### Custom firmware 
 
