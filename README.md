@@ -109,9 +109,8 @@ The way I generated the files for my split keyboard was by making a normal unspl
 
 I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
 1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
-<a>
-  <img src="https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg" width="100%" height="144">
-</a>
+
+![splitline](https://github.com/HalFrgrd/SplitKeyboard/blob/master/explanationImages/makingSplit.svg)
 
 2. Adding more mount holes. I needed some more as I essentially cutout a segment between where the Arduino and the TRS jack.
 
@@ -119,7 +118,7 @@ I saved the files as SVG files as I knew how to edit them on Inkscape. The modif
 
 3. Adding little pockets for the magnets to fit in. I chose to have 6 magnets in pocket so that I would use all of the magnets that I bought. The magnets were to sit in the three middle layers, so I didn't modify the bottom and top layers for this step:
 
-![magnets](./explanationImages/magnets.svg)
+![magnets](./explanationImages/magnets.png)
 
 4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so modified all three middle layers.
 

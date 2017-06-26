@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="250.38528"
+     inkscape:cx="128.59957"
      inkscape:cy="220.26056"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -884,21 +884,5 @@
        style="fill:none;stroke:#000000;stroke-width:0.189;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        points="323.236,7.925 323.187,7.819 323.129,7.716 323.064,7.618 322.991,7.525 322.911,7.439 322.825,7.359 322.732,7.286 322.634,7.221 322.531,7.163 322.425,7.114 322.314,7.073 322.201,7.041 322.085,7.017 321.968,7.004 321.851,7 321.733,7.004 321.616,7.017 321.5,7.041 321.387,7.073 321.276,7.114 321.17,7.163 321.067,7.221 320.969,7.286 320.876,7.359 320.79,7.439 320.71,7.525 320.637,7.618 320.572,7.716 320.514,7.819 320.465,7.925 320.424,8.036 320.392,8.149 320.369,8.265 320.355,8.382 320.351,8.5 320.355,8.617 320.369,8.734 320.392,8.85 320.424,8.963 320.465,9.074 320.514,9.18 320.572,9.283 320.637,9.381 320.71,9.474 320.79,9.56 320.876,9.64 320.969,9.713 321.067,9.778 321.17,9.836 321.276,9.885 321.387,9.926 321.5,9.958 321.616,9.981 321.733,9.995 321.851,10 321.968,9.995 322.085,9.981 322.201,9.958 322.314,9.926 322.425,9.885 322.531,9.836 322.634,9.778 322.732,9.713 322.825,9.64 322.911,9.56 322.991,9.474 323.064,9.381 323.129,9.283 323.187,9.18 323.236,9.074 323.277,8.963 323.309,8.85 323.332,8.734 323.346,8.617 323.351,8.5 323.346,8.382 323.332,8.265 323.309,8.149 323.277,8.036 "
        transform="matrix(-1,0,0,1,346.45288,240.12293)" />
-    <rect
-       y="-250.61771"
-       x="-45.592228"
-       height="4"
-       width="6"
-       id="rect4721-9"
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.189;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       transform="scale(-1)" />
-    <rect
-       y="-250.61771"
-       x="-39.592213"
-       height="4"
-       width="6"
-       id="rect4721-3-9"
-       style="display:inline;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.189;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       transform="scale(-1)" />
   </g>
 </svg>
