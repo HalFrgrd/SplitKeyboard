@@ -13,16 +13,16 @@ There are thumb arrow keys.
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 
-  - [How a split keyboard connects both halves](#)
-    - [Basic concepts](#Basic concepts)
-    - [Wiring between the two halves](#Wiring between the two halves)
-  - [Sourcing your parts](#Sourcing your parts)
-  - [Build guide](#Build guide])
-    - [Designing and planning](#Designing and planning)
-    - [Putting it together](#)
-      - [General assembly](#)
-      - [Wiring](#)
-  - [Custom firmware](#)
+  - [How a split keyboard connects both halves](#how-a-split-keyboard-connects-both-halves)
+    - [Basic concepts](#basic-concepts)
+    - [Wiring between the two halves](#wiring-between-the-two-halves)
+  - [Sourcing your parts](#sourcing-your-parts)
+  - [Build guide](#build-guide])
+    - [Designing and planning](#designing-and-planning)
+    - [Putting it together](#putting-it-together)
+      - [General assembly](#general-assembly)
+      - [Wiring](#wiring)
+  - [Custom firmware](#custom-firmware)
   
 ### How a split keyboard connects both halves
 #### Basic concepts
@@ -45,7 +45,7 @@ If you have a controller in each half, you have to decide how they communicate w
   * Serial uses 3 wires and I2C uses 4 (more about this in the next topic)
   * I2C is faster (but not noticeably because no one types that fast)
 
-This is the method I used because an IO expander was going to be about the same cost as another Arduino. I also used serial just because it was easier working with 3 wires. Wiring for both serial and I2C can be found [here](#Wiring)
+This is the method I used because an IO expander was going to be about the same cost as another Arduino. I also used serial just because it was easier working with 3 wires. Wiring for both serial and I2C can be found [here](#wiring)
 
 
 The last (and least 'clean') method is just to have a lot of wires going between the sides. For instance, all the switches in a row on one side would be connected to a wire that goes between the halves and connects to all the switches on that half and then to the controller. 
