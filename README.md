@@ -37,13 +37,18 @@ For the first two methods listed above, you will need a maximum of 4 wires:
   * One for power
   * One/two for communication depending on protocol.
 
-These are low voltage wires so pretty much any kind of cables can be used. A popular choice is an AUX cord. These are broken up into Tip Ring Sleeve (TRS, 3 internal wires) and Tip Ring Ring Sleeve (TRRS, 4 internal wires) cables: ![TS TRS TRRS cables](http://www.cablechick.com.au/resources/image/trrs-diagram1.jpg)
+These are low voltage wires so pretty much any kind of cables can be used. A popular choice is an AUX cord. These are broken up into Tip Ring Sleeve (TRS, 3 internal wires) and Tip Ring Ring Sleeve (TRRS, 4 internal wires) cables: 
+
+<p = align="centre">
+![TS TRS TRRS cables](http://www.cablechick.com.au/resources/image/trrs-diagram1.jpg)
+</p>
 
 You can identify them on eBay and other places by just looking at the pictures (3 notches or 4 notches). I went with a TRRS cable because I wasn't sure if I wanted to use I2C, but just go with TRS because there is wider variety of colours and more availability. If you want to be considered a pro mechanical keyboard user, get a braided cable that matches your keycap colour scheme :). You will also want a jack on either half of your keyboard so you can easily plug and unplug your cable and TRS jacks are a lot easier to find. Don't be fooled by jacks having 4 or 5 pins as 2 or 3 of them will be connected to the same part of your cable and are just extra pins. TRRS cables are compatible with TRS jacks. I would recommend getting a curly cable as it will look better and reduce clutter on your desk. After all, half of having a split mech keyboard is making your desk layout good (peep [mechanicalheadpens](https://www.reddit.com/r/mechanicalheadpens/))
 
 You can use any other type of cable. I've seen SATA cables or RJ45 cables being used. You have to consider the height of the jack. If its too tall you'll have to make your case taller which isn't ideal. TRS jacks tend to be low profile and cheap which make them popular. My TRS jacks were still quite tall (8mm in a 9mm interior case) so if I were to design one again, I would use a USB C or micro USB breakout board: 
-[microusbbreakoutboard](https://cdn.sparkfun.com//assets/parts/8/5/7/8/12035-02.jpg)
-
+<p = align="centre">
+![microusbbreakoutboard](https://cdn.sparkfun.com//assets/parts/8/5/7/8/12035-02.jpg)
+</p>p
 
 If you want to not bother with those two methods and have many wires going inbetween the halves, I would recommend a ribbon cable. You can probably rip one out of an old computer or printer. It should enough wires for `Number of rows` + `Number of columns` + `2 for power`.
 
@@ -84,6 +89,7 @@ The guidance is different if you are using a PCB as the PCB holds the switches i
 
 This is how much it will cost:
 
+<p = align="centre">
 | Items         | Cost (Aus Rupees)| Cost (USD) |
 | ------------- |:-------------:   | ----------:|
 | Arduinos      | 26               | 20         |
@@ -97,6 +103,7 @@ This is how much it will cost:
 | Magnets       | 4                | 3          |
 | Wire          | 5                | 4          |
 | **Total**     | 170              | 129        |
+</p>
 
 I could have saved mainly on the Arduinos but I wanted some from inside Australia because I didn't want to wait forever and buy them from China. If you want you could also 3D print the keycaps and use MDF instead of acrylic.
 
@@ -142,7 +149,7 @@ I planned my cutouts so that I could secure the TRS jack in place using the ring
 
 ![ringscrew](./explanationImages/ringtoscrewon.jpg)
 
-![ringscrewagain](./explanationImages/trsjack.jp)
+![ringscrewagain](./explanationImages/trsjack.jpg)
 
 #### Putting it together
 ##### General assembly
@@ -155,11 +162,11 @@ Notes from this guide:
 
   * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case. As seen: 
 
-[frontview](./explanationImages/frontviewofplugs.jpg)
+![frontview](./explanationImages/frontviewofplugs.jpg)
 
   * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar. I glued a couple of the acrylic switch cutouts to the bottom layer so that the Arduino would be held in place:
 
-[arduinoholder](./explanationImages/arduinoholders.jpg)
+![arduinoholder](./explanationImages/arduinoholders.jpg)
 
   * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section. The ends of the wires is shown:
 
@@ -206,6 +213,10 @@ You don't have to use the exact same pins on the controller for each half, but i
           `------------------------------------------------------------------------------------------------------------------------------'
              PD1    PD4     PC6   PD7    PE6    PB4    PB5    PB6     F4 |   PD4    PC6   PD7    PE6    PB4    PB5    PB6     PB2   PB3
 ```
+
+
+RGB LED stuff: [this tutorial seems quite good](https://github.com/nicinabox/lets-split-guide/blob/master/rgb-underglow.md) but I never did RGB LED stuff.
+
 
 ### Custom firmware 
 
