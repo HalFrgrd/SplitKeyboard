@@ -133,7 +133,32 @@ Notes from this guide:
   * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case.
   * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar.
   * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section.
-  * I was using magnets in the 
+  * I was using magnets so that the two halves would stick together. I put some hot glue where the magnets should be and squished them in.
+Wiring: I would first start buy wiring the two halves together. This is the wiring for serial:
+![serialwiring](http://qmk.fm/lets_split/serial_wiring.png)
+And this is the wiring for I2C:
+![i2cwiring](http://qmk.fm/lets_split/i2c_wiring.png)
+You wire these wires to the pins on your jack and use the identical pins on the jack of the other half.
+Then you can wire the columns and rows like Matt3o shows to any of the input / ouput pins. Searching for a pin out diagram for your controller will help:
+![pinoutpromicro](./explanationImages/pinoutpromicro.PNG)
+You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later:
+
+`
+          ,------------------------------------------------------------------------------------------------------------------------------.
+  PF5(A2) | Esc  | blkn |   f1 |   f2 |   f3 |  f4  |  f5  |  f6  |   no |  f7  |  f8  |   f9 | f10  |  f11 | f12  | voldn| volup| mute  | PD1
+          |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
+  PF6(A1) | blkn | grv  |   1  |    2 |    3 |   4  |   5  |   6  |   no |   7  |   8  |    9 |   0  |  -   |   =  | no   | bksp | del   | PF4
+          |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
+  PF7(A0) | blkn | tab  |   q  |    w |    e |   r  |   t  |   no |   no |   y  |   u  |    i |   o  |  p   |   [  |  ]   |   \  | prtsc | PF5
+          |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
+     PB1  | blkn | cpslk|   a  |    s |    d |   f  |   g  |   no |   no |   h  |   j  |    k |   l  |  ;   |   '  | no   | enter| no    | PF6
+          |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
+     PB3  | blkn |lshift|   z  |    x |    c |   v  |   b  |   no |   no |   n  |   m  |    , |   .  |  /   |   no |rshift| upar | blkn  | PF7
+          |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
+     PB2  | lctr | gui  |  alt | larr |   no |  spc |  no  |   no |   no | uparr| dwnar| rarr |  fn  |  no  | meta | larr | dwnar| rarr  | PB1
+          `------------------------------------------------------------------------------------------------------------------------------'
+             PD1    PD4     PC6   PD7    PE6    PB4    PB5    PB6     F4 |   PD4    PC6   PD7    PE6    PB4    PB5    PB6     PB2   PB3
+`
 
 ### Custom firmware 
 
@@ -144,22 +169,30 @@ I used QMK for the firmware. The installation is well documented on the QMK GitH
 But if you have a fully custom split, I would recommend modifying the Let's Split folder as I couldn't figure out how to add split functionality to the blank keymap. When modifying the Let's Split firmware there are a few files you need to edit:
 
   * /lets_split/keymaps/copyanotherkeymapfolder/config.h
+
     Here you can use `#define USE_SERIAL` or `#define USE_I2C`
   * /lets_split/keymaps/copyanotherkeymapfolder/keymap.c
+
     This is where you get to define all the layers you will have on your keyboard and what all the keys do.
   * /lets_split/rev2/config.h
+
     Edit the `#define MANUFACTURER` and other definitions to whatever you like
     > `#define MATRIX_ROWS` should be the number of total rows. e.g. 5 in the left and 7 in right would mean `#define MATRIX_ROWS 12`
     > `#define MATRIX_COLUMNS` should be the number of total columns. e.g. 6 in the left and 7 in right would mean `#define MATRIX_COLUMNS 13`
+
     I used seperate pins in each half so when I built the firmware for the left side I would uncomment the first two lines and comment the last two:
+
     > `// #define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2} //leftside
+    >
     > // #define MATRIX_COL_PINS { D1, D4, C6, D7, E6, B4, B5, B6, F4 } //leftside
     >
     > #define MATRIX_ROW_PINS { D1, F4, F5, F6, F7, B1} //rightside
+    >
     > #define MATRIX_COL_PINS { B3, B2, B6, B5, B4, E6, D7, C6, D4 } //rightside`
   * /lets_split/rev2/rev2.h
+
     This file has definitions about the layout of the keyboard so that the keymap file can be used. The main thing to do is to change the definitions for KEYMAP or KC_KEYMAP so that it matches your layout (i.e. the correct number of rows and columns) or you will get errors when building.
 
-
+All these files are located in the [lets_splitFirmware](./lets_splitFirmware/) folder if you want to look at them.
 
 When flashing the firmware onto the Arduino's, they must in "bootloader mode". The Arduino's can either run the program on them, or be in a mode where they rewrite their memory using whatever the computer passes them; this is bootloader mode. When you first buy an Arduino, they are in bootloader mode but when you want to re-flash them they need to be put back into bootloader mode. This is done by quickly connecting the RESET and GROUND pins. Some people to connect these pins to a small button and have that on the outside of the case. I chose to have two wires protruding through the LED slot on a switch. This is  a so that I can take the keycap off, and quickly connect the two wires. Much easier than having to disassemble the case to get to the Arduino. I re-flash my Arduino's around 20 times so it's worth considering how you will short the two pins.
