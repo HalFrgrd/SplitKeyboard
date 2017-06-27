@@ -40,14 +40,14 @@ For the first two methods listed above, you will need a maximum of 4 wires:
 These are low voltage wires so pretty much any kind of cables can be used. A popular choice is an AUX cord. These are broken up into Tip Ring Sleeve (TRS, 3 internal wires) and Tip Ring Ring Sleeve (TRRS, 4 internal wires) cables: 
 
 <p = align="centre">
-![TS TRS TRRS cables](http://www.cablechick.com.au/resources/image/trrs-diagram1.jpg)
+<img src="http://www.cablechick.com.au/resources/image/trrs-diagram1.jpg">
 </p>
 
 You can identify them on eBay and other places by just looking at the pictures (3 notches or 4 notches). I went with a TRRS cable because I wasn't sure if I wanted to use I2C, but just go with TRS because there is wider variety of colours and more availability. If you want to be considered a pro mechanical keyboard user, get a braided cable that matches your keycap colour scheme :). You will also want a jack on either half of your keyboard so you can easily plug and unplug your cable and TRS jacks are a lot easier to find. Don't be fooled by jacks having 4 or 5 pins as 2 or 3 of them will be connected to the same part of your cable and are just extra pins. TRRS cables are compatible with TRS jacks. I would recommend getting a curly cable as it will look better and reduce clutter on your desk. After all, half of having a split mech keyboard is making your desk layout good (peep [mechanicalheadpens](https://www.reddit.com/r/mechanicalheadpens/))
 
 You can use any other type of cable. I've seen SATA cables or RJ45 cables being used. You have to consider the height of the jack. If its too tall you'll have to make your case taller which isn't ideal. TRS jacks tend to be low profile and cheap which make them popular. My TRS jacks were still quite tall (8mm in a 9mm interior case) so if I were to design one again, I would use a USB C or micro USB breakout board: 
 <p = align="centre">
-![microusbbreakoutboard](https://cdn.sparkfun.com//assets/parts/8/5/7/8/12035-02.jpg)
+<img src="https://cdn.sparkfun.com//assets/parts/8/5/7/8/12035-02.jpg">
 </p>p
 
 If you want to not bother with those two methods and have many wires going inbetween the halves, I would recommend a ribbon cable. You can probably rip one out of an old computer or printer. It should enough wires for `Number of rows` + `Number of columns` + `2 for power`.
