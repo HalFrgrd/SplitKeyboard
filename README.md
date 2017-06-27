@@ -14,11 +14,11 @@ There are thumb arrow keys.
 
 
   - [How a split keyboard connects both halves](#)
-    - [Basic concepts](#)
-    - [Wiring between the two halves](#)
-  - [Sourcing your parts](#)
-  - [Build guide](#)
-    - [Designing and planning](#)
+    - [Basic concepts](#Basic concepts)
+    - [Wiring between the two halves](#Wiring between the two halves)
+  - [Sourcing your parts](#Sourcing your parts)
+  - [Build guide](#Build guide])
+    - [Designing and planning](#Designing and planning)
     - [Putting it together](#)
       - [General assembly](#)
       - [Wiring](#)
