@@ -4,40 +4,45 @@ This is a split DIY custom keyboard loosely based on:
   * Ultimate Hacking Keyboard (interlocking ability)
   * General ten key less design
   * Preonic (I liked how the bottom row was nearly all 1u)
-  
+
+It is also interlocking with magnets to snap it together.
+There are thumb arrow keys.
+[See here for images](http://imgur.com/a/XaVwF)
   
 ### How a split keyboard connects both halves
 #### Basic concepts
 While researching, I didn't find a comprehensive guide on split keyboard concepts.
 These are the ways I learnt it could be done:
-  * Having a controller (Teensy or an Arduino in one half) and an IO expander in the other half.
+  * Having a controller (Teensy or an Arduino) in one half and an IO expander in the other half.
   * Having two controllers, one in each half which communicate via one of two protocols:
     * Serial or
 	 * I2C
   * One controller and a bunch of wires between the halves
 
-Controller + IO expander: The way the wiring works is that each row and each column is wired individually to a pin on somekind of controller. Say you have a controller with 20 available pins, your keyboard can have at most 100 keys as you can have 10 rows and 10 columns. If you want more keys, you use and IO expander. An IO expander has a bunch of pins for wiring the rows and columns to and a few special pins that are wired to the controller. This special pin condenses all the other pins and can pass all the information from the pins to the controller. So you can have a controller in one half and an IO expander in the other and have a only a few wires between the two halves.
+Controller + IO expander: The way the wiring in any keyboard works is that each row and each column is wired individually to a pin on somekind of controller. Say you have a controller with 20 available pins, your keyboard can have at most 100 keys as you can have 10 rows and 10 columns. If you want more keys, you use and IO expander. An IO expander has a bunch of pins for wiring the rows and columns to and a few special pins that are wired to the controller on the other half of the keyboard. Only two pins are used for communication between the IO expander and the Arduino. special pin condenses all the other pins and can pass all the information from the pins to the controller. So you can have a controller in one half and an IO expander in the other and have only a few wires between the two halves.
+
+![wiringioexpander](https://github.com/benblazak/ergodox-firmware/blob/master/src/keyboard/ergodox/circuit-diagram.svg)
 
 	
-Two controllers: In this method, each half has a controller. The second controller (the one that isn't plugged directyl into the computer) acts like a more versatile IO expander. I say more versatile because you can plug into the secondary half or use both halves indepently. It can act as a controller when you want it to. I believe that the firmware on the secondary half acts only as forwarding to signals on to the other half and the keymap that is on it doesn't get used. But when you have it plugged in seperately, it runs the keymap that you programmed to it. So when it is being used as a secondary half it can behave in one way, but if you use it one its own, it might act as a numpad (or any other custom keymap).
+Two controllers: In this method, each half has a controller. The second controller (the one that isn't plugged directly into the computer) acts like a more versatile IO expander. I say more versatile because you can plug the secondary half into the computer or use both halves independently. It can act as a controller when you want it to. I believe that the firmware on the secondary half is used only to forward the signals on to the other half and the keymap that is on this secondary controller doesn't get used. But when you have it plugged into the computer separately, it runs the keymap that you programmed to it. So when it is being used as a secondary half it can behave in one way, but if you use it one its own, it might act as a numpad (or any other custom keymap).
 
-If you have a controller in each half, you have to decide how they communicate with each other; what communication protocol do they use. I have learnt that the two main ones are Serial and I2C. Sparkfun does a great beginner friendly in depth look at them: [serial](https://learn.sparkfun.com/tutorials/serial-communication) and [I2C](https://learn.sparkfun.com/tutorials/i2c). On a side note, Sparkfun tells you a suggested topics before reading the chosen topic, so if you want to learn more about the electronics involved, start on Sparkfun. Without going in depth, the main differences are:
+If you have a controller in each half, you have to decide how they communicate with each other; what communication protocol do they use. I have learnt that the two main ones are Serial and I2C. Sparkfun does a great beginner friendly in depth look at them: [serial](https://learn.sparkfun.com/tutorials/serial-communication) and [I2C](https://learn.sparkfun.com/tutorials/i2c). On a side note, Sparkfun tells you a list of suggested topics before reading the chosen topic, so if you want to learn more about the electronics involved, start on Sparkfun. Without going in depth, the main differences are:
   * Serial uses 3 wires and I2C uses 4 (more about this in the next topic)
   * I2C is faster (but not noticeably because no one types that fast)
 
 This is the method I used because an IO expander was going to be about the same cost as another Arduino. I also used serial just because it was easier working with 3 wires.
 
 
-The last (and probably worst) method is just to have a lot of wires going between the sides. For instance, all the switches in a row on one side would be connected to a wire that goes between the halves and connects to all the switches on that half and then to the controller. 
+The last (and least 'clean') method is just to have a lot of wires going between the sides. For instance, all the switches in a row on one side would be connected to a wire that goes between the halves and connects to all the switches on that half and then to the controller. 
 
-The way you choose for the Arduino's to communicate with each other affects the choice in wires that you have to make.
+The method you will affect the choice in wires that you have to make.
 #### Wiring between the two halves
 For the first two methods listed above, you will need a maximum of 4 wires:
   * One for ground
   * One for power
   * One/two for communication depending on protocol.
 
-These are low voltage wires so pretty much any kind of cables can be used. A popular choice is an AUX cord. These are broken up into Tip Ring Sleeve (TRS, 3 internal wires) and Tip Ring Ring Sleeve (TRRS, 4 internal wires) cables: 
+These are low power wires so pretty much any kind of cable can be used. A popular choice is an AUX cord. These are broken up into Tip Ring Sleeve (TRS, 3 internal wires) and Tip Ring Ring Sleeve (TRRS, 4 internal wires) cables: 
 
 <p = align="centre">
 <img src="http://www.cablechick.com.au/resources/image/trrs-diagram1.jpg">
@@ -48,9 +53,10 @@ You can identify them on eBay and other places by just looking at the pictures (
 You can use any other type of cable. I've seen SATA cables or RJ45 cables being used. You have to consider the height of the jack. If its too tall you'll have to make your case taller which isn't ideal. TRS jacks tend to be low profile and cheap which make them popular. My TRS jacks were still quite tall (8mm in a 9mm interior case) so if I were to design one again, I would use a USB C or micro USB breakout board: 
 <p = align="centre">
 <img src="https://cdn.sparkfun.com//assets/parts/8/5/7/8/12035-02.jpg">
-</p>p
+</p>
 
-If you want to not bother with those two methods and have many wires going inbetween the halves, I would recommend a ribbon cable. You can probably rip one out of an old computer or printer. It should enough wires for `Number of rows` + `Number of columns` + `2 for power`.
+If you want to not bother with those two methods and have many wires going inbetween the halves, I would recommend a ribbon cable. You can probably rip one out of an old computer or printer. It should enough wires for `Number of rows` + `Number of columns` + `2 for power`. I have never tried nor seen, but I think a USB C cable with a breakout board on either end would be quite elegant. USB C has 24 wires.
+
 
 
 ### Sourcing your parts
@@ -59,11 +65,11 @@ This is the shopping I had:
   * Materials:
     * 2 Arduino Pro Micros
     * 91 key switches
-    * Stablizers
+    * Stabilizers
     * Keycaps
     * 2 TRS jacks
     * 1 curly TRRS cable 
-    * 91 Diodes (200 pack)
+    * 91 1N4148 Diodes (200 pack)
     * 3 sheets of 400x300mm clear acrylic (3mm thick)
     * 24 2mm heigh, 4mm diameter magnets
     * 12 3mm nuts and bolts (20mm long)
@@ -79,7 +85,7 @@ This is the shopping I had:
 
 Everything I don't mention below, I bought on eBay.
 
-I am living in Australia so I bought stablizers and key switches from [mechkb.com](https://mechkb.com/). The key switches were 120 Gateron Browns. I would go for these ones if you are unsure because they are not too clicky but still have a satisfying tactile bump.
+I am living in Australia so I bought stabilizers and key switches from [mechkb.com](https://mechkb.com/). The key switches were 120 Gateron Browns. I would go for these ones if you are unsure because they are not too clicky but still have a satisfying tactile bump.
 
 Keycaps were from [Banggood](https://www.banggood.com/) (white dual shot). I made sure that my key layout could be adapted from a standard 104 keyset. To do this I compared the summary table on [keyboard layout editor](http://www.keyboard-layout-editor.com/#/) for my keyboard and the standard 104 ANSI layout.
 
@@ -89,12 +95,11 @@ The guidance is different if you are using a PCB as the PCB holds the switches i
 
 This is how much it will cost:
 
-<p = align="centre">
 | Items         | Cost (Aus Rupees)| Cost (USD) |
 | ------------- |:-------------:   | ----------:|
 | Arduinos      | 26               | 20         |
 | Switches      | 56               | 43         |
-| Stabilsers    | 11               | 8          |
+| Stabilzers    | 11               | 8          |
 | Keycaps       | 21               | 16         |
 | TRS Jacks     | 4                | 3          |
 | AUX Cable     | 5                | 4          |
@@ -103,18 +108,17 @@ This is how much it will cost:
 | Magnets       | 4                | 3          |
 | Wire          | 5                | 4          |
 | **Total**     | 170              | 129        |
-</p>
 
 I could have saved mainly on the Arduinos but I wanted some from inside Australia because I didn't want to wait forever and buy them from China. If you want you could also 3D print the keycaps and use MDF instead of acrylic.
 
 
 ### Build guide
 #### Designing and planning
-This was my favourite part of the process. Explore the subreddits, forums, and Pinterest and find designs that you like. Afterwards, got to the [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/). This website allows you to completely plan your keyboard layout either from scratch or from a preset. This is where you will find your summary table so that you know the sizes and number of keycaps you need. Also, under the raw data tab you will find the layout in an array. This is used by the next website, [SwillKB Builder](http://builder.swillkb.com/), to generate the case and switch plate. The website has its own detailed documentation in the blue question marks, but this is how each one of the options you need to fill in works:
+This was my favourite part of the process. Explore the subreddits, forums, and Pinterest and find designs that you like. Afterwards, got to [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/). This website allows you to completely plan your keyboard layout either from scratch or from a preset. This is where you will find your summary table so that you know the sizes and number of keycaps you need. Also, under the raw data tab you will find the layout in an array. This is used by the next website, [SwillKB Builder](http://builder.swillkb.com/), to generate the case and switch plate. The website has its own detailed documentation in the blue question marks, but this is how each one of the options you need to fill in works:
 
 1. Plate Layout: You copy and paste your raw data into the Plate Layout box. The raw data contains all the spacing and positions of the key switches which is used to generate the switch plate and size of the case.
 2. Switch Type: The two main types of switches are Cherry and Alps. Gaterons are clones of Cherry's so just used type 1 (the square ones).
-3. Stablizers: There are two main types of stabilizers (used to stablize big keys): Cherry and Costar. I used the Cherry + Costar type as I didn't know what to go with and this option allows both.
+3. Stabilizers: There are two main types of stabilizers (used to stabilize keys >= 2u): Cherry and Costar. I used the Cherry + Costar type as I didn't know what to go with and this option allows both.
 4. Case Type: You probably want sandwhich as this is custom made to your keyboard.
 5. USB Cutout: I turned this off as I wanted one in each half. I edited the files afterwards and put one in each half.
 6. Mount Holes: I turned this off as I used the polygon tool to have more control over where the holes should go.
@@ -123,10 +127,10 @@ This was my favourite part of the process. Explore the subreddits, forums, and P
 9. Custom Polygons: This allows you to put in custom shapes where you want. It's a good feature because editing 5 files afterwards can be a pain. I used their example to get nice looking mount holes that come out of the sides of the case.
 10. Kerf: I didn't use this feature as I was laser cutting and the key switches were a good fit. 
 11. Line Color: I didn't bother with this as I was going to edit the files afterwards. Some laser cutters use specific colours to know when to cut and when to engrave.
-12. Line Weight: Some laser cutters will see the line as rectangle that needs multiple passes if the line is too thick. I left this blank as I was going to edit the files after. 
+12. Line Weight: Some laser cutters will see the line as a rectangle that needs multiple passes if the line is too thick. I left this blank as I was going to edit the files after. 
 
 
-The way I generated the files for my split keyboard was by making a normal unsplit keyboard on KLE and on SwillKB Builder. I then used Inkscape to manually put in a line where I wanted the split to be. This way I could get a nice interlocking split keyboard.
+The way I generated the files for my split keyboard was by making a [normal unsplit keyboard on KLE](http://www.keyboard-layout-editor.com/#/gists/94c5c17f0c58b8debc7f5c045de34edd) and on SwillKB Builder. I then used Inkscape to manually put in a line where I wanted the split to be. This way I could get a nice interlocking split keyboard.
 
 I saved the files as SVG files as I knew how to edit them on Inkscape. The modifications I made to the case plans from SwillKB were:
 1. Adding a line where I wanted the keyboard to be split. This made the acrylic quite thin near the split line but it was layered up so it was strong enough.
@@ -150,6 +154,8 @@ I planned my cutouts so that I could secure the TRS jack in place using the ring
 ![ringscrew](./explanationImages/ringtoscrewon.jpg)
 
 ![ringscrewagain](./explanationImages/trsjack.jpg)
+
+I laser cut the case at a FabLab. This a community diy centre with 3D printers and a laser cutter. The laser cutter was $5 per use and you could buy material there.
 
 #### Putting it together
 ##### General assembly
@@ -195,7 +201,7 @@ Then you can wire the columns and rows like Matt3o shows to any of the input / o
 
 ![pinoutpromicro](./explanationImages/pinoutpromicro.png)
 
-You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later (Note: QMK uses B2 instead of PB2):
+You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later (Note: QMK pin naming (for example) uses B2 instead of PB2):
 
 ```
           ,------------------------------------------------------------------------------------------------------------------------------.
@@ -244,11 +250,8 @@ But if you have a fully custom split, I would recommend modifying the Let's Spli
 
     ```
     // #define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2} //leftside
-    
     // #define MATRIX_COL_PINS { D1, D4, C6, D7, E6, B4, B5, B6, F4 } //leftside
-    
     #define MATRIX_ROW_PINS { D1, F4, F5, F6, F7, B1} //rightside
-    
     #define MATRIX_COL_PINS { B3, B2, B6, B5, B4, E6, D7, C6, D4 } //rightside
     ```
 
