@@ -186,7 +186,7 @@ You wire these wires to the pins on your jack and use the identical pins on the 
 
 Then you can wire the columns and rows like Matt3o shows to any of the input / ouput pins. Searching for a pin out diagram for your controller will help:
 
-![pinoutpromicro](./explanationImages/pinoutpromicro.PNG)
+![pinoutpromicro](./explanationImages/pinoutpromicro.png)
 
 You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later (Note: QMK uses B2 instead of PB2):
 
