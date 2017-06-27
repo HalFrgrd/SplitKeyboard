@@ -143,7 +143,7 @@ Then you can wire the columns and rows like Matt3o shows to any of the input / o
 ![pinoutpromicro](./explanationImages/pinoutpromicro.PNG)
 You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later:
 
-`
+```
           ,------------------------------------------------------------------------------------------------------------------------------.
   PF5(A2) | Esc  | blkn |   f1 |   f2 |   f3 |  f4  |  f5  |  f6  |   no |  f7  |  f8  |   f9 | f10  |  f11 | f12  | voldn| volup| mute  | PD1
           |------+------+------+------+------+-------------+------+------+------+------+------+------+------+------+------+------+-------|
@@ -158,7 +158,7 @@ You don't have to use the exact same pins on the controller for each half, but i
      PB2  | lctr | gui  |  alt | larr |   no |  spc |  no  |   no |   no | uparr| dwnar| rarr |  fn  |  no  | meta | larr | dwnar| rarr  | PB1
           `------------------------------------------------------------------------------------------------------------------------------'
              PD1    PD4     PC6   PD7    PE6    PB4    PB5    PB6     F4 |   PD4    PC6   PD7    PE6    PB4    PB5    PB6     PB2   PB3
-`
+```
 
 ### Custom firmware 
 
@@ -177,18 +177,21 @@ But if you have a fully custom split, I would recommend modifying the Let's Spli
   * /lets_split/rev2/config.h
 
     Edit the `#define MANUFACTURER` and other definitions to whatever you like
-    > `#define MATRIX_ROWS` should be the number of total rows. e.g. 5 in the left and 7 in right would mean `#define MATRIX_ROWS 12`
-    > `#define MATRIX_COLUMNS` should be the number of total columns. e.g. 6 in the left and 7 in right would mean `#define MATRIX_COLUMNS 13`
+    `#define MATRIX_ROWS` should be the number of total rows. e.g. 5 in the left and 7 in right would mean `#define MATRIX_ROWS 12`
+    `#define MATRIX_COLUMNS` should be the number of total columns. e.g. 6 in the left and 7 in right would mean `#define MATRIX_COLUMNS 13`
 
     I used seperate pins in each half so when I built the firmware for the left side I would uncomment the first two lines and comment the last two:
 
-    > `// #define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2} //leftside
-    >
-    > // #define MATRIX_COL_PINS { D1, D4, C6, D7, E6, B4, B5, B6, F4 } //leftside
-    >
-    > #define MATRIX_ROW_PINS { D1, F4, F5, F6, F7, B1} //rightside
-    >
-    > #define MATRIX_COL_PINS { B3, B2, B6, B5, B4, E6, D7, C6, D4 } //rightside`
+    ```
+    // #define MATRIX_ROW_PINS { F5, F6, F7, B1, B3, B2} //leftside
+    
+    // #define MATRIX_COL_PINS { D1, D4, C6, D7, E6, B4, B5, B6, F4 } //leftside
+    
+    #define MATRIX_ROW_PINS { D1, F4, F5, F6, F7, B1} //rightside
+    
+    #define MATRIX_COL_PINS { B3, B2, B6, B5, B4, E6, D7, C6, D4 } //rightside
+    ```
+
   * /lets_split/rev2/rev2.h
 
     This file has definitions about the layout of the keyboard so that the keymap file can be used. The main thing to do is to change the definitions for KEYMAP or KC_KEYMAP so that it matches your layout (i.e. the correct number of rows and columns) or you will get errors when building.
