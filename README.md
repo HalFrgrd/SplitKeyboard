@@ -17,7 +17,7 @@ There are thumb arrow keys.
     - [Basic concepts](#basic-concepts)
     - [Wiring between the two halves](#wiring-between-the-two-halves)
   - [Sourcing your parts](#sourcing-your-parts)
-  - [Build guide](#build-guide])
+  - [Build guide](#build-guide)
     - [Designing and planning](#designing-and-planning)
     - [Putting it together](#putting-it-together)
       - [General assembly](#general-assembly)
