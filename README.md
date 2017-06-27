@@ -162,9 +162,9 @@ You don't have to use the exact same pins on the controller for each half, but i
 
 ### Custom firmware 
 
-I used QMK for the firmware. The installation is well documented on the QMK GitHub and website. It's very easy to use of you are using a kit as there are all the common kits (Ergodox, Let's Split). If you have an unsplit keyboard you can run the following command from root to get a new project setup:
+I used QMK for the firmware. The installation is well documented by [QMK](https://docs.qmk.fm/). I would read through the documentation as it will help a lot in understanding what is going on. It's very easy to use of you are using a kit as there are all the common kits (Ergodox, Let's Split). If you have an unsplit keyboard you can run the following command from root to get a new project setup:
 
-> `$ ./util/new_project.sh nameofnewproject`
+`$ ./util/new_project.sh nameofnewproject`
 
 But if you have a fully custom split, I would recommend modifying the Let's Split folder as I couldn't figure out how to add split functionality to the blank keymap. When modifying the Let's Split firmware there are a few files you need to edit:
 
@@ -173,11 +173,13 @@ But if you have a fully custom split, I would recommend modifying the Let's Spli
     Here you can use `#define USE_SERIAL` or `#define USE_I2C`
   * /lets_split/keymaps/copyanotherkeymapfolder/keymap.c
 
-    This is where you get to define all the layers you will have on your keyboard and what all the keys do.
+    This is where you get to define all the layers you will have on your keyboard and what all the keys do. Read the [documentation](https://docs.qmk.fm/) if you haven't as this explains how to make a good keymap. Also there is an active subreddit [r/olkb](https://www.reddit.com/r/olkb/) if you have more questions.
   * /lets_split/rev2/config.h
 
-    Edit the `#define MANUFACTURER` and other definitions to whatever you like
+    Edit the `#define MANUFACTURER` and other definitions to whatever you like.
+
     `#define MATRIX_ROWS` should be the number of total rows. e.g. 5 in the left and 7 in right would mean `#define MATRIX_ROWS 12`
+
     `#define MATRIX_COLUMNS` should be the number of total columns. e.g. 6 in the left and 7 in right would mean `#define MATRIX_COLUMNS 13`
 
     I used seperate pins in each half so when I built the firmware for the left side I would uncomment the first two lines and comment the last two:
@@ -198,4 +200,8 @@ But if you have a fully custom split, I would recommend modifying the Let's Spli
 
 All these files are located in the [lets_splitFirmware](./lets_splitFirmware/) folder if you want to look at them.
 
-When flashing the firmware onto the Arduino's, they must in "bootloader mode". The Arduino's can either run the program on them, or be in a mode where they rewrite their memory using whatever the computer passes them; this is bootloader mode. When you first buy an Arduino, they are in bootloader mode but when you want to re-flash them they need to be put back into bootloader mode. This is done by quickly connecting the RESET and GROUND pins. Some people to connect these pins to a small button and have that on the outside of the case. I chose to have two wires protruding through the LED slot on a switch. This is  a so that I can take the keycap off, and quickly connect the two wires. Much easier than having to disassemble the case to get to the Arduino. I re-flash my Arduino's around 20 times so it's worth considering how you will short the two pins.
+Once you have succesfully edited those files, it is time to build (AKA compile) your keymap. I would recommend making a `Makefile` file in your keymap directory like I have done [here](./lets_splitFirmware/keymaps/hfvoy/). This makes it easier to compile just your keymap and not all the others. The documnentation goes much more in depth about building using the `make` command. Go to your keymap directory and run the `make` command. This will either spew out errors that you need to deal with, or will create a `hex` file in the qmk root folder. Now that you have compiled your firmware, it is time to flash it.
+
+When flashing the firmware onto the Arduino's, they must in "bootloader mode". The Arduino's can either run the program on them, or be in a mode where they rewrite their memory using whatever the computer passes them; this is bootloader mode. When you first buy an Arduino, they are in bootloader mode but when you want to re-flash them they need to be put back into bootloader mode. This is done by quickly connecting the RESET and GROUND pins. Some people to connect these pins to a small button and have that on the outside of the case. I chose to have two wires protruding through the LED slot on a switch. I can take the keycap off, and quickly connect the two wires. Much easier than having to disassemble the case to get to the Arduino. I re-flashed my Arduino's around 20 times so it's worth considering how you will short the two pins.
+
+On Windows, I found the best program for flashing was AVRDUDESS. [This guide](https://gist.github.com/CampAsAChamp/e747d2b605c0c32923593b529f82ccdd) was great at explaining how to install and flash using AVRDUDESS.
