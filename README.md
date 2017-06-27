@@ -8,6 +8,21 @@ This is a split DIY custom keyboard loosely based on:
 It is also interlocking with magnets to snap it together.
 There are thumb arrow keys.
 [See here for images](http://imgur.com/a/XaVwF)
+
+
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+
+  - [How a split keyboard connects both halves](#)
+    - [Basic concepts](#)
+    - [Wiring between the two halves](#)
+  - [Sourcing your parts](#)
+  - [Build guide](#)
+    - [Designing and planning](#)
+    - [Putting it together](#)
+      - [General assembly](#)
+      - [Wiring](#)
+  - [Custom firmware](#)
   
 ### How a split keyboard connects both halves
 #### Basic concepts
