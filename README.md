@@ -73,6 +73,7 @@ This is the shopping I had:
     * Needle nose pliers come in handy
 
 Everything I don't mention below, I bought on eBay.
+
 I am living in Australia so I bought stablizers and key switches from [mechkb.com](https://mechkb.com/). The key switches were 120 Gateron Browns. I would go for these ones if you are unsure because they are not too clicky but still have a satisfying tactile bump.
 
 Keycaps were from [Banggood](https://www.banggood.com/) (white dual shot). I made sure that my key layout could be adapted from a standard 104 keyset. To do this I compared the summary table on [keyboard layout editor](http://www.keyboard-layout-editor.com/#/) for my keyboard and the standard 104 ANSI layout.
@@ -103,6 +104,7 @@ I could have saved mainly on the Arduinos but I wanted some from inside Australi
 ### Build guide
 #### Designing and planning
 This was my favourite part of the process. Explore the subreddits, forums, and Pinterest and find designs that you like. Afterwards, got to the [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/). This website allows you to completely plan your keyboard layout either from scratch or from a preset. This is where you will find your summary table so that you know the sizes and number of keycaps you need. Also, under the raw data tab you will find the layout in an array. This is used by the next website, [SwillKB Builder](http://builder.swillkb.com/), to generate the case and switch plate. The website has its own detailed documentation in the blue question marks, but this is how each one of the options you need to fill in works:
+
 1. Plate Layout: You copy and paste your raw data into the Plate Layout box. The raw data contains all the spacing and positions of the key switches which is used to generate the switch plate and size of the case.
 2. Switch Type: The two main types of switches are Cherry and Alps. Gaterons are clones of Cherry's so just used type 1 (the square ones).
 3. Stablizers: There are two main types of stabilizers (used to stablize big keys): Cherry and Costar. I used the Cherry + Costar type as I didn't know what to go with and this option allows both.
@@ -132,29 +134,61 @@ I saved the files as SVG files as I knew how to edit them on Inkscape. The modif
 
 ![magnets](./explanationImages/magnets.png)
 
-4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so modified all three middle layers.
+4. Adding cutouts on the necessary layers for the Arduino and TRS jack. The Arduino was 4mm thick I just modified the two lower middle layers. The TRS jack was 8mm thick so I modified all three middle layers.
 
 ![cutouts](./explanationImages/cutouts.png)
 
+I planned my cutouts so that I could secure the TRS jack in place using the ring screw:
+
+![ringscrew](./explanationImages/ringtoscrewon.jpg)
+
+![ringscrewagain](./explanationImages/trsjack.jp)
 
 #### Putting it together
+##### General assembly
 I would follow [Matt3o's guide](https://deskthority.net/workshop-f7/brownfox-step-by-step-t6050.html) for the soldering and installation of the switches, and wiring of the controller.
 Notes from this guide:
   * Use lots of hot glue when you secure the switches down because if you are pulling off keycaps, you don't want to pull off the key switch with it.
-  * The orientation of the switches doesn't matter at all which comes in handy when you want to fit in a TRS jack. As the TRS jacks were quite tall they would have caused some got the switches to be pushed back up as there wasn't enough room for both the switches ans the jack. I had to cut part of the bottoms off two switches and rotate them a bit so that everything fitted in the case. There is quite a lot of unused space in the switches so you can cut nearly all the bottom plastic housing off without compromising functionality.
-  * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case.
-  * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar.
-  * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section.
-  * I was using magnets so that the two halves would stick together. I put some hot glue where the magnets should be and squished them in.
+  * The orientation of the switches doesn't matter at all which comes in handy when you want to fit in a TRS jack. As the TRS jacks were quite tall they would have caused some got the switches to be pushed back up as there wasn't enough room for both the switches ans the jack. I had to cut part of the bottoms off two switches and rotate them a bit so that everything fitted in the case. There is quite a lot of unused space in the switches so you can cut nearly all the bottom plastic housing off without compromising functionality. Here you can see the switches that I cut:
 
-Wiring: I would first start buy wiring the two halves together. This is the wiring for serial:
+![cutswitches](./explanationImages/cutswitchesfortrsjack.jpg)
+
+  * I didn't use a micro USB cable inside the case as I didn't think it was necessary. The cable from the computer plugs directly into the case. As seen: 
+
+[frontview](./explanationImages/frontviewofplugs.jpg)
+
+  * It is quite tight having the Arduino directly under the switches so keep your wires short and tidy. Otherwise like Matt3o, you can fit the controller under the space bar. I glued a couple of the acrylic switch cutouts to the bottom layer so that the Arduino would be held in place:
+
+[arduinoholder](./explanationImages/arduinoholders.jpg)
+
+  * I soldered wires to the RST and GND pins and pushed the ends through the LED slot on the a switch near the edge of the keyboard. I hot glued them in place. This is so I can easily put the Arduino into bootloader mode. I will explain more about this in the firmware section. The ends of the wires is shown:
+
+![resetwires](./explanationImages/resetwires.jpg)
+
+  * I was using magnets so that the two halves would stick together. I put some hot glue where the magnets should be and squished them in. As seen:
+
+![magnets](./explanationImages/magnets.jpg)
+
+With the bits of the acrylic that were left over from the middle layers and some from a first prototype, I made a palmrest:
+![palmrest](./explanationImages/palmrest.jpg)
+
+
+##### Wiring
+I would first start by wiring the two halves together. This is the wiring for serial:
+
 ![serialwiring](http://qmk.fm/lets_split/serial_wiring.png)
+
 And this is the wiring for I2C:
+
 ![i2cwiring](http://qmk.fm/lets_split/i2c_wiring.png)
+
 You wire these wires to the pins on your jack and use the identical pins on the jack of the other half.
+
 Then you can wire the columns and rows like Matt3o shows to any of the input / ouput pins. Searching for a pin out diagram for your controller will help:
+
 ![pinoutpromicro](./explanationImages/pinoutpromicro.PNG)
-You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later:
+
+You don't have to use the exact same pins on the controller for each half, but it is easier if you do. I would make a table like this whilst you are wiring to your pins as you will use it later (Note: QMK uses B2 instead of PB2):
 
 ```
           ,------------------------------------------------------------------------------------------------------------------------------.
