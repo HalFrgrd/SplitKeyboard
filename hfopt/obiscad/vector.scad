@@ -85,7 +85,7 @@ module vectorz(l=10, l_arrow=4, mark=false)
 //--  Parameters:
 //--    v : Target orientation
 //--    vref: Vector reference. It is the vector of the local frame
-//--          of the object that want to be poiting in the direction
+//--          of the object that want to be pointing in the direction
 //--          of v
 //--    roll: Rotation of the object around the v axis
 //-------------------------------------------------------------------
