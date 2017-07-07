@@ -352,32 +352,28 @@
 
 (defn getcolPntData [arr x y]
 	"Similar to getrowPntData but this deals with x. See getrowPntData and smartretrPntData"
-	(if (<= 0 x (dec arrXWid) )
-
+	(cond 
+		(= x arrXWid)
+			(retr arr (dec x) y)
+		(= x -1)
+			(retr arr (inc x) y)
+		:else
 			(retr arr x y)
-
-			(if (= x arrXWid)
-				(retr arr (dec x) y)
-				(if (= x -1)
-					(retr arr (inc x) y)
-					)
-				)	
 		)
 	)
 
 (defn getrowPntData [arr x y]
 	"Retrieves the pntData at x y in arr and makes sure that y is in the correct range. See smartretrPntData 
 	for what it does when y is out of bounds. This only deals with y as it gets getcolPntData to deal with x."
-	(if (<= 0 y (dec arrYLen) )
+	(cond 
+		(= y arrYLen)
+			(getcolPntData arr x (dec y))
+		(= y -1)
+			(getcolPntData arr x (inc y))
+		:else 
 			(getcolPntData arr x y) 
+			)
 
-			(if (= y arrYLen)
-				(getcolPntData arr x (dec y))
-				(if (= y -1)
-					(getcolPntData arr x (inc y))
-					)
-				)	
-		)
 	)
 
 (defn smartretrPntData [arr x y]
@@ -389,17 +385,26 @@
 
 	getrowPntData is used because inside of getrowPntData it calls getcolPntData. You can't also 
 	call getrowPntData inside getcolPntData because then you will get an infinite loop."
+	
+
 	(getrowPntData arr x y)
+	
+
 	)
 
 (defn putupapost [arr xcoin ycoin pos]
-	;(prn pos (= pos "tr"))
 	(let [
+		pntData (smartretrPntData arr xcoin ycoin)
+		cpntP 		(:cpntPos pntData)
+		cpntV 		(:cpntVec pntData)
+		cpntA 		(:cpntAng pntData)
 		xtrans (cond 
 				(= xcoin -1) 
 					(- 0 leftedgepadding mount-hole-width)
 				(= xcoin arrXWid) 
 					(+ rightedgepadding mount-hole-width)
+				; (and (not :existence) (< xcoin arrXWid))
+				; 	(- 0 leftedgepadding mount-hole-width)
 				:else
 					0
 				)
@@ -411,10 +416,7 @@
 				:else
 					0
 				)
-		pntData (smartretrPntData arr xcoin ycoin)
-		cpntP 		(:cpntPos pntData)
-		cpntV 		(:cpntVec pntData)
-		cpntA 		(:cpntAng pntData)
+		
 
 		post (cond
 				(= pos :tl) (partial web-post-tl)
@@ -431,7 +433,6 @@
 			)
 
 		))
-
 
 (defn makeconnectors [arr] 
 	"Creates posts at the corner of each key switch and hulls them with the posts on other keycaps.
@@ -451,7 +452,6 @@
 				))
 
 			;Columns connectors
-
 			(for [ycoin (range -1 arrYLen) xcoin (range arrXWid)]
 				(color [(rand) 1 1 1] (triangle-hulls
 					(putupapost arr xcoin       ycoin :tr)
@@ -461,6 +461,7 @@
 					)
 				))
 
+			;Diagonal connectors
 			(for [ycoin (range -1 arrYLen) xcoin (range -1 arrXWid)]
 				(color [1 1 (rand) 1] (triangle-hulls
 					(putupapost arr xcoin       ycoin       :tr)
@@ -470,11 +471,7 @@
 					)
 				))
 
-
-					)
-			)
-	
-		)
+			)))
 
 (defn findnewvec [[x1 y1 z1] [x2 y2 z2]]
 	"Simple function to find vector between two points."
@@ -701,20 +698,22 @@
 
 	)
 
-(defn dontshowthesekeys [arr]
+(defn shouldthesekeysexist?youbethejudge [arr]
 	(let [existencearray
 					[
+					[false true true true true true true] 
 					[true true true true true true true] 
 					[true true true true true true true] 
 					[true true true true true true true] 
 					[true true true true true true true] 
 					[true true true true true true true] 
-					[true true true true true true true] 
-					]
+					]]
+		(vec (for [ycoin (range arrYLen)]
+			(vec (for [xcoin (range arrXWid)]
+				(assoc (retr arr xcoin ycoin) :existence (get-in existencearray [ycoin xcoin]))
 
 
-
-		])
+		)))))
 	)
 
 
@@ -725,6 +724,7 @@
 		;(moveonXYplane 0 0 -100) ;thread this one into others
 		
 		(curvexaxis)
+		(shouldthesekeysexist?youbethejudge)
 
 		;(gradualcurve (/ (Math/PI) 6) (/ (Math/PI) 36))
 		;(newcurveitbaby)
