@@ -6,6 +6,10 @@
             [unicode-math.core :refer :all]
             [clojure.math.numeric-tower :refer :all]))
 
+
+(spit "things/post-demo.scad" ;cleans file
+     nil )
+
 ;;;;;;;;
 ;TRANSLATION OF PRIMARY FUNCTIONS OF ATTACH MODULE
 ;;;;;;;;
@@ -14,6 +18,7 @@
 
 (defn- sqr [x] ;square x
   (expt x 2))
+
 
 (defn modofvec [[x y z]] ;modulus of vecotr
 
@@ -209,7 +214,7 @@
 		)
 	))
 
-(defn moveonXYplane [arr & more]
+(defn moveonXYplane [arr xmove ymove zmove]
 	(vec(for [ycoin (range arrYLen)]
 		(vec (for [xcoin (range arrXWid)]
 			(let [
@@ -224,7 +229,7 @@
 
 				{:xcoord xval, 
 				 :ycoord yval,
-				 :cpntPos [ (- (cpntP 0) 40) (- (cpntP 1) 130) (+ (cpntP 2) 5)], 
+				 :cpntPos [ (+ (cpntP 0) xmove) (+ (cpntP 1) ymove) (+ (cpntP 2) zmove)], 
 				 :cpntVec cpntV,
 				 :cpntAng cpntA}
 				
@@ -242,23 +247,24 @@
 ;; SA Keycaps ;;
 ;;;;;;;;;;;;;;;;
 (def plate-thickness 4)
-(def sa-length 18.25)
-(def sa-double-length 37.5)
-(def sa-cap {1 (let [bl2 (/ 18.5 2)
-                     m (/ 17 2)
+(def dsa-length 18.25)
+(def dsa-double-length 37.5)
+(def heightbaseofkeycap 6.1 )
+(def dsa-cap {1 (let [bl2 (/ 18.5 2)
+                     m (/ 18 2)
                      key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
                                         (extrude-linear {:height 0.1 :twist 0 :convexity 0})
                                         (translate [0 0 0.05]))
                                    (->> (polygon [[m m] [m (- m)] [(- m) (- m)] [(- m) m]])
                                         (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 6]))
+                                        (translate [0 0 1.9]))
                                    (->> (polygon [[6 6] [6 -6] [-6 -6] [-6 6]])
                                         (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 12])))]
+                                        (translate [0 0 7.9])))]
                  (->> key-cap
-                      (translate [0 0 (+ 5 plate-thickness)])
+                      (translate [0 0 heightbaseofkeycap])
                       (color [220/255 163/255 163/255 1])))
-             2 (let [bl2 (/ sa-double-length 2)
+             2 (let [bl2 (/ dsa-double-length 2)
                      bw2 (/ 18.25 2)
                      key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
                                         (extrude-linear {:height 0.1 :twist 0 :convexity 0})
@@ -292,7 +298,7 @@
 
 			(attach [cpntP cpntV cpntA]
 					[[0 0 0] [0 0 1] 0]
-					(sa-cap 1)
+					(dsa-cap 1)
 				)
 
 	)))
@@ -324,11 +330,10 @@
 (def mount-hole-height 14)
 
 
-(def web-thickness 3.5)
+(def web-thickness plate-thickness )
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
-                   (translate [0 0 (+ (/ web-thickness -2)
-                                      plate-thickness)])))
+                   (translate [0 0 (/ web-thickness -2)])))
 
 (def post-adj (/ post-size 2))
 (def web-post-tr (translate [(- (/ mount-hole-width  2) post-adj) (- (/ mount-hole-height  2) post-adj) 0] web-post))
@@ -387,7 +392,45 @@
 	(getrowPntData arr x y)
 	)
 
+(defn putupapost [arr xcoin ycoin pos]
+	;(prn pos (= pos "tr"))
+	(let [
+		xtrans (cond 
+				(= xcoin -1) 
+					(- 0 leftedgepadding mount-hole-width)
+				(= xcoin arrXWid) 
+					(+ rightedgepadding mount-hole-width)
+				:else
+					0
+				)
+		ytrans (cond 
+				(= ycoin -1) 
+					(- 0 bottedgepadding mount-hole-height)
+				(= ycoin arrYLen) 
+					(+ topedgepadding mount-hole-height)
+				:else
+					0
+				)
+		pntData (smartretrPntData arr xcoin ycoin)
+		cpntP 		(:cpntPos pntData)
+		cpntV 		(:cpntVec pntData)
+		cpntA 		(:cpntAng pntData)
 
+		post (cond
+				(= pos :tl) (partial web-post-tl)
+				(= pos :bl) (partial web-post-bl)
+				(= pos :tr) (partial web-post-tr)
+				(= pos :br) (partial web-post-br)
+				)
+		]
+
+		(attach 
+			[cpntP cpntV cpntA]
+			[[0 0 0] [0 0 1] 0]
+			(translate [xtrans ytrans 0] post)
+			)
+
+		))
 
 
 (defn makeconnectors [arr] 
@@ -398,360 +441,37 @@
 		(concat
 			;Row connectors
 
-			(for [ycoin (range arrYLen)
-				  xcoin (range -1 arrXWid)] 
+			(for [ycoin (range arrYLen) xcoin (range -1  arrXWid)]
+				(color [1 (rand) 1 1] (triangle-hulls
+					(putupapost arr xcoin       ycoin :tr)
+					(putupapost arr xcoin       ycoin :br)
+					(putupapost arr (inc xcoin) ycoin :tl)
+					(putupapost arr (inc xcoin) ycoin :bl)
+					)
+				))
 
-				  (let [
-					pntData 	(smartretrPntData arr xcoin ycoin)
-					cpntP 		(:cpntPos pntData)
-					cpntV 		(:cpntVec pntData)
-					cpntA 		(:cpntAng pntData)
-					nextColPntData (smartretrPntData arr (inc xcoin) ycoin)
-					cpntPNxCol  (:cpntPos nextColPntData)
-					cpntVNxCol  (:cpntVec nextColPntData)
-					cpntANxCol 	(:cpntAng nextColPntData)
-					] (color [1 (rand) 1 1]  
-						(cond
-						 (<= 0 xcoin (dec (dec arrXWid))) 
-						(triangle-hulls
-						(attach 
-							[cpntPNxCol cpntVNxCol cpntANxCol] 
-							[[0 0 0] [0 0 1] 0] 
-							web-post-tl)
-						(attach 
-							[cpntP cpntV cpntA] 
-							[[0 0 0] [0 0 1] 0] 
-							web-post-tr)
-						(attach 
-							[cpntPNxCol cpntVNxCol cpntANxCol] 
-							[[0 0 0] [0 0 1] 0] 
-							web-post-bl)
-						(attach 
-							[cpntP cpntV cpntA] 
-							[[0 0 0] [0 0 1] 0] 
-							web-post-br)
-						)
-						
-						( = xcoin -1)
-							(triangle-hulls
-							(attach 
-								[cpntPNxCol cpntVNxCol cpntANxCol] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tl)
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [( - leftedgepadding) 0 0] web-post-tl))
-							(attach 
-								[cpntPNxCol cpntVNxCol cpntANxCol] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-bl)
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [( - leftedgepadding) 0 0] web-post-bl))
-							)
+			;Columns connectors
 
-						( = xcoin (dec arrXWid))
-							(triangle-hulls
-							(attach 
-								[cpntPNxCol cpntVNxCol cpntANxCol] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [rightedgepadding 0 0] web-post-tr))
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tr)
-							(attach 
-								[cpntPNxCol cpntVNxCol cpntANxCol] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [rightedgepadding 0 0] web-post-br))
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-br)
-							)
+			(for [ycoin (range -1 arrYLen) xcoin (range arrXWid)]
+				(color [(rand) 1 1 1] (triangle-hulls
+					(putupapost arr xcoin       ycoin :tr)
+					(putupapost arr xcoin (inc ycoin) :br)
+					(putupapost arr xcoin       ycoin :tl)
+					(putupapost arr xcoin (inc ycoin) :bl)
+					)
+				))
+
+			(for [ycoin (range -1 arrYLen) xcoin (range -1 arrXWid)]
+				(color [1 1 (rand) 1] (triangle-hulls
+					(putupapost arr xcoin       ycoin       :tr)
+					(putupapost arr xcoin       (inc ycoin) :br)
+					(putupapost arr (inc xcoin) ycoin       :tl)
+					(putupapost arr (inc xcoin) (inc ycoin) :bl)
+					)
+				))
 
 
-							)
-
-						)))
-
-			;columns connecting
-			(for [ycoin (range -1  arrYLen	)
-				  xcoin (range arrXWid)] 
-
-				  (let [
-					pntData 	(smartretrPntData arr xcoin ycoin)
-					cpntP 		(:cpntPos pntData)
-					cpntV 		(:cpntVec pntData)
-					cpntA 		(:cpntAng pntData)
-					nextRowPntData (smartretrPntData arr xcoin (inc ycoin))
-					cpntPNxRow  (:cpntPos nextRowPntData)
-					cpntVNxRow  (:cpntVec nextRowPntData)
-					cpntANxRow 	(:cpntAng nextRowPntData)
-					] (color [(rand) 1 1 1]
-						;(prn ycoin (dec arrYLen) (= ycoin (dec arrYLen)))
-						(cond 
-							(<= 0 ycoin (dec (dec arrYLen))  )
-								(triangle-hulls
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tl)
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tr)
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-bl)
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-br))
-
-							(= ycoin -1)
-							(triangle-hulls
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [0 (- bottedgepadding) 0] web-post-bl))
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [0 (- bottedgepadding) 0] web-post-br))
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-bl)
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-br))
-								
-							(= ycoin (dec arrYLen))
-							(triangle-hulls
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								 web-post-tl)
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tr)
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [0 topedgepadding 0] web-post-tl))
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								(translate [0 topedgepadding 0] web-post-tr))
-							))
-
-
-				)))
-
-			;diagonal connecting
-			(for [ycoin (range -1  arrYLen)
-				  xcoin (range -1  arrXWid)] 
-
-				  (let [
-					pntData 	(smartretrPntData arr xcoin ycoin)
-					cpntP 		(:cpntPos pntData)
-					cpntV 		(:cpntVec pntData)
-					cpntA 		(:cpntAng pntData)
-					nextRowPntData (smartretrPntData arr xcoin (inc ycoin))
-					cpntPNxRow  (:cpntPos nextRowPntData)
-					cpntVNxRow  (:cpntVec nextRowPntData)
-					cpntANxRow 	(:cpntAng nextRowPntData)
-					nextColPntData (smartretrPntData arr (inc xcoin) ycoin)
-					cpntPNxCol  (:cpntPos nextColPntData)
-					cpntVNxCol  (:cpntVec nextColPntData)
-					cpntANxCol 	(:cpntAng nextColPntData)
-					nextRowAndColPntData (smartretrPntData arr (inc xcoin) (inc ycoin))
-					cpntPNxRowAndCol  (:cpntPos nextRowAndColPntData)
-					cpntVNxRowAndCol  (:cpntVec nextRowAndColPntData)
-					cpntANxRowAndCol  (:cpntAng nextRowAndColPntData)
-					] (color [1 0.6 (rand) 1] 
-						(cond 
-							( and (<= 0 xcoin (dec (dec arrXWid))  )(<= 0 ycoin (dec (dec arrYLen)) )) ;when both are in range
-							(triangle-hulls
-							(attach 
-								[cpntP cpntV cpntA] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tr)
-							(attach 
-								[cpntPNxCol cpntVNxCol cpntANxCol] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-tl)
-							(attach 
-								[cpntPNxRow cpntVNxRow cpntANxRow] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-br)
-							(attach 
-								[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-								[[0 0 0] [0 0 1] 0] 
-								web-post-bl))
-							(and (= xcoin -1) (<= 0 ycoin (dec (dec arrYLen)))) ;when y is in range and x is -1
-								(triangle-hulls
-								(attach 
-									[cpntP cpntV cpntA] 
-									[[0 0 0] [0 0 1] 0] 
-									(translate [(- leftedgepadding) 0 0] web-post-tl))
-								(attach 
-									[cpntPNxCol cpntVNxCol cpntANxCol] 
-									[[0 0 0] [0 0 1] 0] 
-									web-post-tl)
-								(attach 
-									[cpntPNxRow cpntVNxRow cpntANxRow] 
-									[[0 0 0] [0 0 1] 0] 
-									(translate [(- leftedgepadding) 0 0] web-post-bl))
-								(attach 
-									[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-									[[0 0 0] [0 0 1] 0] 
-									web-post-bl))
-							(and (= xcoin (dec arrXWid)) (<= 0 ycoin (dec (dec arrYLen)))) ; when y is in range x is arrxwid
-								(triangle-hulls
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										web-post-tr)
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding 0 0] web-post-tr))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										web-post-br)
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding 0 0] web-post-br)))
-							(and (<= 0 xcoin (dec (dec arrXWid))) (= ycoin -1)) ; when y is -1 x is in range
-								(triangle-hulls
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 (- bottedgepadding) 0] web-post-br))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 (- bottedgepadding) 0] web-post-bl))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										web-post-br)
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										 web-post-bl)) 
-							(and (<= 0 xcoin (dec (dec arrXWid))) (= ycoin (dec arrYLen))) ; when y is arrylen x is in range
-								(triangle-hulls
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 topedgepadding 0] web-post-tr))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 topedgepadding 0] web-post-tl))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										web-post-tr)
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										web-post-tl))
-							(and (= xcoin (dec arrXWid)) (= ycoin (dec arrYLen))) ; when y is arrylen x is arrxwid
-								(triangle-hulls
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 0 0] web-post-tr))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 topedgepadding 0] web-post-tr))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding 0 0] web-post-tr))
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding topedgepadding 0] web-post-tr)))
-
-							(and (= xcoin -1) (= ycoin (dec arrYLen))) ; when y is arrylen x is -1
-								(triangle-hulls
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 0 0] web-post-tl))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [(- leftedgepadding) 0 0] web-post-tl))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 topedgepadding 0] web-post-tl))
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [(- leftedgepadding) topedgepadding 0] web-post-tl)))
-
-							(and (= xcoin -1) (= ycoin -1)) ; when y is -1 x is -1
-								(triangle-hulls	
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 0 0] web-post-bl))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [(- leftedgepadding) 0 0] web-post-bl))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 (- bottedgepadding) 0] web-post-bl))
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [(- leftedgepadding) (- bottedgepadding) 0] web-post-bl)))
-
-
-							(and (= xcoin (dec arrXWid))  (= ycoin -1)) ; when c is arrxlen y is -1
-								(triangle-hulls	
-									(attach 
-										[cpntP cpntV cpntA] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 0 0] web-post-br))
-									(attach 
-										[cpntPNxCol cpntVNxCol cpntANxCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding 0 0] web-post-br))
-									(attach 
-										[cpntPNxRow cpntVNxRow cpntANxRow] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [0 (- bottedgepadding) 0] web-post-br))
-									(attach 
-										[cpntPNxRowAndCol cpntVNxRowAndCol cpntANxRowAndCol] 
-										[[0 0 0] [0 0 1] 0] 
-										(translate [rightedgepadding (- bottedgepadding) 0] web-post-br)))
-
-
-							)
-
-
-
-								)
-
-					)))
+					)
 			)
 	
 		)
@@ -869,8 +589,8 @@
 
 
 				newVec 		[
-							(- (fpartialx (* (cpntP 0) xmulti) (* (cpntP 1) ymulti)) ) 
-							(- (fpartialy (* (cpntP 1) ymulti) (* (cpntP 0) xmulti)) )
+							(- (* (fpartialx (* (cpntP 0) xmulti) (* (cpntP 1) ymulti)) zmulti) ) 
+							(- (* (fpartialy (* (cpntP 1) ymulti) (* (cpntP 0) xmulti)) zmulti))
 							1 ]
 				]
 				
@@ -885,6 +605,56 @@
 
 	))))
 	)
+
+(defn gradualcurve [arr rowangle columnangle]
+		"This curves the array gradually."
+	(vec (for [ycoin (range arrYLen)]
+		(vec (for [xcoin (range arrXWid)]
+
+			(let [
+				pntData (retr arr xcoin ycoin)
+				xval		(:xcoord pntData)
+				yval  		(:ycoord pntData)
+				cpntP 		(:cpntPos pntData)
+				cpntV 		(:cpntVec pntData)
+				cpntA 		(:cpntAng pntData)
+				xmod		(int (/ arrXWid 2))
+				ymod		(int (/ arrYLen 2))
+
+				betterxval  (- xval xmod)
+				betteryval  (inc (- yval xmod))
+
+				currentcolangle (* betteryval columnangle)
+				currentrowangle (* betterxval columnangle)
+				 		
+
+				rowrotated	[
+							(cpntP 0) 
+							(- (* (cpntP 1) (Math/cos currentcolangle))  (* (cpntP 2) (Math/sin currentcolangle)) ) 
+							(* (+ (* (cpntP 1) (Math/sin currentcolangle))  (* (cpntP 2) (Math/cos currentcolangle)) ) 1)
+							]
+
+				fullyrotated [
+							(- (* (rowrotated 0) (Math/cos currentrowangle))  (* (rowrotated 2) (Math/sin currentrowangle)) ) 
+							(rowrotated 1)
+							(+ (* (rowrotated 2) (Math/cos currentrowangle))  (* (rowrotated 0) (Math/sin currentrowangle)) ) 
+
+							]
+
+				newVec 		(findnewvec fullyrotated [0 0 1] ) 
+				]
+				
+				(prn betteryval)
+				{:xcoord xval, 
+				 :ycoord yval,
+				 :cpntPos fullyrotated, 
+				 :cpntVec newVec,
+				 :cpntAng cpntA}
+
+
+
+			))))))
+
 
 
 
@@ -902,13 +672,62 @@
 
 	)
 
+(defn curvexaxis [arr]
+	(let [
+		arguments [  arr
+					(partial #(+ (expt (abs (* %2 0.002)) 2) (* %1 0)))
+					
+					(partial #(* %2 %1 0) )
+					(partial #(+ (*  (* %1 0.002) 2) (* %2 0)))
+					1
+					1
+					1]
+		]
+
+	(apply apply3dequation arguments)
+
+
+		))
+
+
+(defn showfunction [fxy xrange yrange]
+	(for [x (range (- xrange) xrange) y (range (- yrange) yrange)] (
+		
+		(spit "things/post-demo.scad"
+      		(point x y (fxy x y) )) :append true)
+		
+
+		)
+
+	)
+
+(defn dontshowthesekeys [arr]
+	(let [existencearray
+					[
+					[true true true true true true true] 
+					[true true true true true true true] 
+					[true true true true true true true] 
+					[true true true true true true true] 
+					[true true true true true true true] 
+					[true true true true true true true] 
+					]
+
+
+
+		])
+	)
 
 
 (defn transformationFunctions [arr & more]
 	"these are the functions that rewrite the array"
-	(-> ;(moveonXYplane arr) ;thread this one into others
+	(-> 
 		(centrearray arr)
-		(newcurveitbaby)
+		;(moveonXYplane 0 0 -100) ;thread this one into others
+		
+		(curvexaxis)
+
+		;(gradualcurve (/ (Math/PI) 6) (/ (Math/PI) 36))
+		;(newcurveitbaby)
 		)
 	)
 
@@ -920,7 +739,7 @@
 
 		(makeconnectors arr)
 		;(showkeycaps arr)
-		;(showconnectors arr)
+		(showconnectors arr)
 		)
 	)
 
@@ -934,4 +753,4 @@
 	)
 
 (spit "things/post-demo.scad"
-      (write-scad (buildarray )))
+      (write-scad (buildarray )) :append true)
