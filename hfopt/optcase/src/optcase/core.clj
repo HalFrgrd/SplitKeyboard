@@ -175,7 +175,7 @@
 
 (def keywidthForSpacing 	14.4)
 (def keySpacing 			5.05)
-(def arrXWid				7 )
+(def arrXWid				8 )
 (def arrYLen				5 )
 
 (defn createarray [x y] ;x is across, y is down
@@ -295,11 +295,11 @@
 			cpntV 		(:cpntVec pntData)
 			cpntA 		(:cpntAng pntData)
 				]
-
-			(attach [cpntP cpntV cpntA]
-					[[0 0 0] [0 0 1] 0]
-					(dsa-cap 1)
-				)
+			(when (pntData :existence)
+				(attach [cpntP cpntV cpntA]
+						[[0 0 0] [0 0 1] 0]
+						(dsa-cap 1)
+					))
 
 	)))
 
@@ -334,12 +334,19 @@
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
                    (translate [0 0 (/ web-thickness -2)])))
+(def edgepost (scale [1 1 3] web-post))
+
 
 (def post-adj (/ post-size 2))
 (def web-post-tr (translate [(- (/ mount-hole-width  2) post-adj) (- (/ mount-hole-height  2) post-adj) 0] web-post))
 (def web-post-tl (translate [(+ (/ mount-hole-width -2) post-adj) (- (/ mount-hole-height  2) post-adj) 0] web-post))
 (def web-post-bl (translate [(+ (/ mount-hole-width -2) post-adj) (+ (/ mount-hole-height -2) post-adj) 0] web-post))
 (def web-post-br (translate [(- (/ mount-hole-width  2) post-adj) (+ (/ mount-hole-height -2) post-adj) 0] web-post))
+
+(def web-post-edge-tr (translate [(- (/ mount-hole-width  2) post-adj) (- (/ mount-hole-height  2) post-adj) 0] edgepost))
+(def web-post-edge-tl (translate [(+ (/ mount-hole-width -2) post-adj) (- (/ mount-hole-height  2) post-adj) 0] edgepost))
+(def web-post-edge-bl (translate [(+ (/ mount-hole-width -2) post-adj) (+ (/ mount-hole-height -2) post-adj) 0] edgepost))
+(def web-post-edge-br (translate [(- (/ mount-hole-width  2) post-adj) (+ (/ mount-hole-height -2) post-adj) 0] edgepost))
 
 (defn triangle-hulls [& shapes]
 	"TBH I didn't write this. Adereth did. Its just a nice hulling function that makes 
@@ -357,6 +364,8 @@
 			(retr arr (dec x) y)
 		(= x -1)
 			(retr arr (inc x) y)
+		(< x -1)
+			(retr arr 0 y)
 		:else
 			(retr arr x y)
 		)
@@ -370,6 +379,8 @@
 			(getcolPntData arr x (dec y))
 		(= y -1)
 			(getcolPntData arr x (inc y))
+		(< y -1)
+			(getcolPntData arr x 0)
 		:else 
 			(getcolPntData arr x y) 
 			)
@@ -392,19 +403,36 @@
 
 	)
 
-(defn putupapost [arr xcoin ycoin pos]
+(defmacro make-fn [m] 
+  `(fn [& args#] 
+    (eval `(~'~m ~@args#))))
+
+(defn putupapost [arr xcoin ycoin pos callingfrom makingwhat]
 	(let [
 		pntData (smartretrPntData arr xcoin ycoin)
 		cpntP 		(:cpntPos pntData)
 		cpntV 		(:cpntVec pntData)
 		cpntA 		(:cpntAng pntData)
+		exists		(:existence pntData)
+
 		xtrans (cond 
 				(= xcoin -1) 
 					(- 0 leftedgepadding mount-hole-width)
 				(= xcoin arrXWid) 
 					(+ rightedgepadding mount-hole-width)
-				; (and (not :existence) (< xcoin arrXWid))
-				; 	(- 0 leftedgepadding mount-hole-width)
+				(= exists false)
+					; (cond 
+					; 	(= :callfromthisone callingfrom)
+					; 		0
+					; 	(= :callfromleftbelow callingfrom)
+					; 		0
+					; 	(= :callfromleft callingfrom)
+					; 		0
+					; 	(= :callfrombelow callingfrom)
+					; 		0
+						
+					; 	)
+					0
 				:else
 					0
 				)
@@ -413,65 +441,220 @@
 					(- 0 bottedgepadding mount-hole-height)
 				(= ycoin arrYLen) 
 					(+ topedgepadding mount-hole-height)
+				(= exists false)
+					; (cond 
+					; 	(= :callfromthisone callingfrom)
+					; 		2
+					; 	(= :callfromleftbelow callingfrom)
+					; 		-2
+					; 	(= :callfromleft callingfrom)
+					; 		(if (= :makingcolumns makingwhat)
+					; 			2
+					; 			-2)
+					; 	(= :callfrombelow callingfrom)
+					; 		-2
+						
+					; 	)
+
+					0
 				:else
 					0
 				)
 		
+		edge  
+				(or 
+				    (= xcoin -1 ) 
+					(= ycoin -1 ) 
+					(= xcoin arrXWid) 
+					(= ycoin arrYLen) 
+					(and (= xcoin 0) (= callingfrom :callfromleft))
+					(and (= xcoin 0) (= callingfrom :callfromleftbelow ))
+					(and (= ycoin 0) (= callingfrom :callfrombelow))
+					(and (= ycoin 0) (= callingfrom :callfromleftbelow ))
 
-		post (cond
-				(= pos :tl) (partial web-post-tl)
-				(= pos :bl) (partial web-post-bl)
-				(= pos :tr) (partial web-post-tr)
-				(= pos :br) (partial web-post-br)
-				)
+					(and (= ycoin (dec arrYLen)) (or    (and (= makingwhat :makingcolumns) (= callingfrom :callfromthisone))
+														(and (= makingwhat :makingdiag) ( or (= callingfrom :callfromthisone) (= callingfrom :callfromleft)))
+														))
+					(and (= xcoin (dec arrXWid)) (or    (and (= makingwhat :makingrows) (= callingfrom :callfromthisone))
+														(and (= makingwhat :makingdiag) (= callingfrom :callfromthisone))
+														(and (= makingwhat :makingdiag) (= callingfrom :callfrombelow))))
+
+					(let [
+						neighbours 			(cond
+												(= makingwhat :makingcolumns)
+													(cond
+														(= callingfrom :callfromthisone)
+															[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr xcoin (inc ycoin))]
+														(= callingfrom :callfrombelow)
+															[(smartretrPntData arr xcoin (dec ycoin)) (smartretrPntData arr xcoin ycoin)]
+														)
+												(= makingwhat :makingrows)
+													(cond
+														(= callingfrom :callfromthisone)
+															[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr (inc xcoin) ycoin)]
+														(= callingfrom :callfromleft)
+															[(smartretrPntData arr (dec xcoin) ycoin) (smartretrPntData arr xcoin ycoin)]
+														)
+												(= makingwhat :makingdiag)
+													(cond
+														(= callingfrom :callfromthisone)
+															[(smartretrPntData arr xcoin ycoin)
+															 (smartretrPntData arr (inc xcoin) ycoin)
+															 (smartretrPntData arr xcoin (inc ycoin))
+															 (smartretrPntData arr (inc xcoin) (inc ycoin))]
+														(= callingfrom :callfromleft)
+															[(smartretrPntData arr (dec xcoin) ycoin)
+															 (smartretrPntData arr xcoin ycoin)
+															 (smartretrPntData arr (dec xcoin) (inc ycoin))
+															 (smartretrPntData arr xcoin (inc ycoin))]
+														(= callingfrom :callfrombelow)
+															[(smartretrPntData arr xcoin (dec ycoin))
+															 (smartretrPntData arr (inc xcoin) (dec ycoin))
+															 (smartretrPntData arr xcoin ycoin)
+															 (smartretrPntData arr (inc xcoin) ycoin)]
+														(= callingfrom :callfromleftbelow)
+															[(smartretrPntData arr (dec xcoin) (dec ycoin))
+															 (smartretrPntData arr xcoin (dec ycoin))
+															 (smartretrPntData arr (dec xcoin) ycoin)
+															 (smartretrPntData arr xcoin ycoin)]
+														)
+											)
+
+						]
+						;(prn (map #(get %1 :existence) neighbours))
+						
+							(->>(map #(get %1 :existence) neighbours) 
+							(map (make-fn not))
+							(apply (make-fn or))
+								)
+
+						 (apply (make-fn or) (map (make-fn not) (map #(get %1 :existence) neighbours) ))
+						 
+						)
+					
+					)
+						
+
+		post (cond 
+
+				(not edge)
+					(cond
+						(= pos :tl) (partial web-post-tl)
+						(= pos :bl) (partial web-post-bl)
+						(= pos :tr) (partial web-post-tr)
+						(= pos :br) (partial web-post-br)
+						)
+
+				edge 
+					(cond
+						(= pos :tl) (partial web-post-edge-tl)
+						(= pos :bl) (partial web-post-edge-bl)
+						(= pos :tr) (partial web-post-edge-tr)
+						(= pos :br) (partial web-post-edge-br)
+						) )
 		]
 
 		(attach 
 			[cpntP cpntV cpntA]
 			[[0 0 0] [0 0 1] 0]
+
 			(translate [xtrans ytrans 0] post)
+
+
 			)
 
+			)
+
+		)
+
+
+
+(defn neigbhourtoexistence? [arr xcoin ycoin buildingwhat]
+
+	(let [existenceofthisone 			( (smartretrPntData arr xcoin ycoin) :existence)
+		  existenceofnextrow 			( (smartretrPntData arr xcoin (inc ycoin)) :existence)
+		  existenceofnextcol 			( (smartretrPntData arr (inc xcoin) ycoin) :existence)
+		  existenceofnextcolandrow		( (smartretrPntData arr (inc xcoin) (inc ycoin)) :existence)]
+		  (cond 
+			(= buildingwhat :buildingcolumnconnects)
+				(or existenceofthisone existenceofnextrow)
+			(= buildingwhat :buildingrowsconnects)
+				(or existenceofthisone existenceofnextcol)
+			(= buildingwhat :buildingdiagonalsconnects)
+				(or existenceofthisone existenceofnextcolandrow existenceofnextrow existenceofnextcol)
+			)
 		))
 
-(defn makeconnectors [arr] 
+	
+
+(defn makeconnectors [arr plateorbase] 
 	"Creates posts at the corner of each key switch and hulls them with the posts on other keycaps.
 	The edges and corners are created by going one less than the array and one more than the array.
 	When the variable is out of bounds, it is caught in the smartretrPntData."
+	(let [
+		function  			(cond
+								(= plateorbase :plate)
+								 	(partial triangle-hulls)
+								(= plateorbase :base)
+									(partial hull)
+							)
+		otherfunction  		(cond
+								(= plateorbase :plate)
+								 	(partial union)
+								(= plateorbase :base)
+									(partial hull)
+							)
+
+		]
 	(apply union
 		(concat
 			;Row connectors
 
-			(for [ycoin (range arrYLen) xcoin (range -1  arrXWid)]
-				(color [1 (rand) 1 1] (triangle-hulls
-					(putupapost arr xcoin       ycoin :tr)
-					(putupapost arr xcoin       ycoin :br)
-					(putupapost arr (inc xcoin) ycoin :tl)
-					(putupapost arr (inc xcoin) ycoin :bl)
+			(for [ycoin (range arrYLen)]
+				(otherfunction
+				(for  [xcoin (range -1  arrXWid)]
+				(when (neigbhourtoexistence? arr xcoin ycoin :buildingrowsconnects)
+					(color [1 (rand) 1 1] (function
+						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingrows)
+						(putupapost arr xcoin       ycoin :br :callfromthisone :makingrows)
+						(putupapost arr (inc xcoin) ycoin :tl :callfromleft    :makingrows)
+						(putupapost arr (inc xcoin) ycoin :bl :callfromleft    :makingrows)
+						)
 					)
-				))
+						
+
+					))))
 
 			;Columns connectors
-			(for [ycoin (range -1 arrYLen) xcoin (range arrXWid)]
-				(color [(rand) 1 1 1] (triangle-hulls
-					(putupapost arr xcoin       ycoin :tr)
-					(putupapost arr xcoin (inc ycoin) :br)
-					(putupapost arr xcoin       ycoin :tl)
-					(putupapost arr xcoin (inc ycoin) :bl)
+			(for [ycoin (range -1 arrYLen)]
+				(otherfunction
+				(for [xcoin (range arrXWid)]
+				(when (neigbhourtoexistence? arr xcoin ycoin :buildingcolumnconnects) 
+					(color [(rand) 1 1 1] (function
+						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingcolumns)
+						(putupapost arr xcoin (inc ycoin) :br :callfrombelow   :makingcolumns)
+						(putupapost arr xcoin       ycoin :tl :callfromthisone :makingcolumns)
+						(putupapost arr xcoin (inc ycoin) :bl :callfrombelow   :makingcolumns)
+						)
 					)
-				))
+					))))
 
 			;Diagonal connectors
-			(for [ycoin (range -1 arrYLen) xcoin (range -1 arrXWid)]
-				(color [1 1 (rand) 1] (triangle-hulls
-					(putupapost arr xcoin       ycoin       :tr)
-					(putupapost arr xcoin       (inc ycoin) :br)
-					(putupapost arr (inc xcoin) ycoin       :tl)
-					(putupapost arr (inc xcoin) (inc ycoin) :bl)
+			(for [ycoin (range -1 arrYLen)]
+				(otherfunction
+				(for [xcoin (range -1 arrXWid)]
+				(when (neigbhourtoexistence? arr xcoin ycoin :buildingdiagonalsconnects)
+					(color [1 1 (rand) 1] (function
+						(putupapost arr xcoin       ycoin       :tr :callfromthisone :makingdiag)
+						(putupapost arr xcoin       (inc ycoin) :br :callfrombelow   :makingdiag)
+						(putupapost arr (inc xcoin) ycoin       :tl :callfromleft    :makingdiag)
+						(putupapost arr (inc xcoin) (inc ycoin) :bl :callfromleftbelow :makingdiag)
+						)
 					)
-				))
 
-			)))
+					))))
+
+			))))
 
 (defn findnewvec [[x1 y1 z1] [x2 y2 z2]]
 	"Simple function to find vector between two points."
@@ -669,13 +852,15 @@
 
 	)
 
-(defn curvexaxis [arr]
+(defn curvexaxisy [arr]
 	(let [
 		arguments [  arr
-					(partial #(+ (expt (abs (* %2 0.002)) 2) (* %1 0)))
-					
+					(partial #(+ (* (expt (abs %1) 2) 0.005) (* %2 0)))
+
+
+					(partial #(+ (*  %1 2 0.005) (* %2 0)))
 					(partial #(* %2 %1 0) )
-					(partial #(+ (*  (* %1 0.002) 2) (* %2 0)))
+					
 					1
 					1
 					1]
@@ -700,17 +885,17 @@
 
 (defn shouldthesekeysexist?youbethejudge [arr]
 	(let [existencearray
-					[
-					[false true true true true true true] 
-					[true true true true true true true] 
-					[true true true true true true true] 
-					[true true true true true true true] 
-					[true true true true true true true] 
-					[true true true true true true true] 
-					]]
+					 [
+					[false true true true true true true true] 
+					[false true true false true true true true] 
+					[false true false false false true false false] 
+					[true false true false true true true true] 
+					[true true true false true true true true] 
+
+					] ]
 		(vec (for [ycoin (range arrYLen)]
 			(vec (for [xcoin (range arrXWid)]
-				(assoc (retr arr xcoin ycoin) :existence (get-in existencearray [ycoin xcoin]))
+				(assoc (retr arr xcoin ycoin) :existence (get-in existencearray [ycoin (- (dec arrXWid) xcoin)]))
 
 
 		)))))
@@ -723,7 +908,8 @@
 		(centrearray arr)
 		;(moveonXYplane 0 0 -100) ;thread this one into others
 		
-		(curvexaxis)
+		(curvexaxisy)
+		;(curvexaxisx)
 		(shouldthesekeysexist?youbethejudge)
 
 		;(gradualcurve (/ (Math/PI) 6) (/ (Math/PI) 36))
@@ -737,8 +923,9 @@
 	(union 
 		;(putsquareinarr arr)
 
-		(makeconnectors arr)
-		;(showkeycaps arr)
+		(makeconnectors arr :plate)
+		;(translate [0 0 -30] (makeconnectors arr :base))
+		(showkeycaps arr)
 		(showconnectors arr)
 		)
 	)
