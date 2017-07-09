@@ -214,7 +214,7 @@
 		)
 	))
 
-(defn moveonXYplane [arr xmove ymove zmove]
+(defn moveonXYplane [arr xmove ymove zmove columnorrow number]
 	(vec(for [ycoin (range arrYLen)]
 		(vec (for [xcoin (range arrXWid)]
 			(let [
@@ -229,7 +229,9 @@
 
 				{:xcoord xval, 
 				 :ycoord yval,
-				 :cpntPos [ (+ (cpntP 0) xmove) (+ (cpntP 1) ymove) (+ (cpntP 2) zmove)], 
+				 :cpntPos (if (= xcoin number) 
+				 				[ (+ (cpntP 0) xmove) (+ (cpntP 1) ymove) (+ (cpntP 2) zmove)]
+				 				cpntP)
 				 :cpntVec cpntV,
 				 :cpntAng cpntA}
 				
@@ -407,7 +409,7 @@
   `(fn [& args#] 
     (eval `(~'~m ~@args#))))
 
-(defn putupapost [arr xcoin ycoin pos callingfrom makingwhat]
+(defn putupapost [arr xcoin ycoin pos callingfrom makingwhat buildedgesornot]
 	(let [
 		pntData (smartretrPntData arr xcoin ycoin)
 		cpntP 		(:cpntPos pntData)
@@ -461,82 +463,85 @@
 					0
 				)
 		
-		edge  
-				(or 
-				    (= xcoin -1 ) 
-					(= ycoin -1 ) 
-					(= xcoin arrXWid) 
-					(= ycoin arrYLen) 
-					(and (= xcoin 0) (= callingfrom :callfromleft))
-					(and (= xcoin 0) (= callingfrom :callfromleftbelow ))
-					(and (= ycoin 0) (= callingfrom :callfrombelow))
-					(and (= ycoin 0) (= callingfrom :callfromleftbelow ))
+		edge    ;this determines if the post should be an edge post or not.
+				;This is easy if x or y is -1 or arrxwid or arrylen.
+				;also easy if x or y is 0 and being called from the left or below. 
+				;Remember that the webbing starts with one key and then awakens keys to the right or above it.
+				;A littl trickier is if x or y is one less than their max. They have to be making columns or rows 
+				;or diags and being called from either this one or from a suitable thing.
+				;For instance, diagonals being called from below shouldn't be edged because this would create edge posts one key in from the actual edge.
+				;Then, if any key in the currently forming web should be non existent, there needs to be an edge post.
+				;For example, |n|c|, n is nonexistent, c is current key. That current key needs to look to the left and see that key exists. It doesn't, so put an edge post up.)
+				;Also |c|n| would need to check to the right.
+				;This is only two combinations for either row or column, but for diagonals, 4 different keys and each one needs to check 3 keys.
+				(if buildedgesornot 
+					(or 
+					    (= xcoin -1 ) 
+						(= ycoin -1 ) 
+						(= xcoin arrXWid) 
+						(= ycoin arrYLen) 
+						(and (= xcoin 0) (= callingfrom :callfromleft))
+						(and (= xcoin 0) (= callingfrom :callfromleftbelow ))
+						(and (= ycoin 0) (= callingfrom :callfrombelow))
+						(and (= ycoin 0) (= callingfrom :callfromleftbelow ))
 
-					(and (= ycoin (dec arrYLen)) (or    (and (= makingwhat :makingcolumns) (= callingfrom :callfromthisone))
-														(and (= makingwhat :makingdiag) ( or (= callingfrom :callfromthisone) (= callingfrom :callfromleft)))
-														))
-					(and (= xcoin (dec arrXWid)) (or    (and (= makingwhat :makingrows) (= callingfrom :callfromthisone))
-														(and (= makingwhat :makingdiag) (= callingfrom :callfromthisone))
-														(and (= makingwhat :makingdiag) (= callingfrom :callfrombelow))))
+						(and (= ycoin (dec arrYLen)) (or    (and (= makingwhat :makingcolumns) (= callingfrom :callfromthisone))
+															(and (= makingwhat :makingdiag) ( or (= callingfrom :callfromthisone) (= callingfrom :callfromleft)))
+															))
+						(and (= xcoin (dec arrXWid)) (or    (and (= makingwhat :makingrows) (= callingfrom :callfromthisone))
+															(and (= makingwhat :makingdiag) (= callingfrom :callfromthisone))
+															(and (= makingwhat :makingdiag) (= callingfrom :callfrombelow))))
 
-					(let [
-						neighbours 			(cond
-												(= makingwhat :makingcolumns)
-													(cond
-														(= callingfrom :callfromthisone)
-															[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr xcoin (inc ycoin))]
-														(= callingfrom :callfrombelow)
-															[(smartretrPntData arr xcoin (dec ycoin)) (smartretrPntData arr xcoin ycoin)]
-														)
-												(= makingwhat :makingrows)
-													(cond
-														(= callingfrom :callfromthisone)
-															[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr (inc xcoin) ycoin)]
-														(= callingfrom :callfromleft)
-															[(smartretrPntData arr (dec xcoin) ycoin) (smartretrPntData arr xcoin ycoin)]
-														)
-												(= makingwhat :makingdiag)
-													(cond
-														(= callingfrom :callfromthisone)
-															[(smartretrPntData arr xcoin ycoin)
-															 (smartretrPntData arr (inc xcoin) ycoin)
-															 (smartretrPntData arr xcoin (inc ycoin))
-															 (smartretrPntData arr (inc xcoin) (inc ycoin))]
-														(= callingfrom :callfromleft)
-															[(smartretrPntData arr (dec xcoin) ycoin)
-															 (smartretrPntData arr xcoin ycoin)
-															 (smartretrPntData arr (dec xcoin) (inc ycoin))
-															 (smartretrPntData arr xcoin (inc ycoin))]
-														(= callingfrom :callfrombelow)
-															[(smartretrPntData arr xcoin (dec ycoin))
-															 (smartretrPntData arr (inc xcoin) (dec ycoin))
-															 (smartretrPntData arr xcoin ycoin)
-															 (smartretrPntData arr (inc xcoin) ycoin)]
-														(= callingfrom :callfromleftbelow)
-															[(smartretrPntData arr (dec xcoin) (dec ycoin))
-															 (smartretrPntData arr xcoin (dec ycoin))
-															 (smartretrPntData arr (dec xcoin) ycoin)
-															 (smartretrPntData arr xcoin ycoin)]
-														)
-											)
-
-						]
-						;(prn (map #(get %1 :existence) neighbours))
-						
+						(let [
+						neighbours 	(cond
+										(= makingwhat :makingcolumns)
+											(cond
+												(= callingfrom :callfromthisone)
+													[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr xcoin (inc ycoin))]
+												(= callingfrom :callfrombelow)
+													[(smartretrPntData arr xcoin (dec ycoin)) (smartretrPntData arr xcoin ycoin)]
+												)
+										(= makingwhat :makingrows)
+											(cond
+												(= callingfrom :callfromthisone)
+													[(smartretrPntData arr xcoin ycoin) (smartretrPntData arr (inc xcoin) ycoin)]
+												(= callingfrom :callfromleft)
+													[(smartretrPntData arr (dec xcoin) ycoin) (smartretrPntData arr xcoin ycoin)]
+												)
+										(= makingwhat :makingdiag)
+											(cond
+												(= callingfrom :callfromthisone)
+													[(smartretrPntData arr xcoin ycoin)
+													 (smartretrPntData arr (inc xcoin) ycoin)
+													 (smartretrPntData arr xcoin (inc ycoin))
+													 (smartretrPntData arr (inc xcoin) (inc ycoin))]
+												(= callingfrom :callfromleft)
+													[(smartretrPntData arr (dec xcoin) ycoin)
+													 (smartretrPntData arr xcoin ycoin)
+													 (smartretrPntData arr (dec xcoin) (inc ycoin))
+													 (smartretrPntData arr xcoin (inc ycoin))]
+												(= callingfrom :callfrombelow)
+													[(smartretrPntData arr xcoin (dec ycoin))
+													 (smartretrPntData arr (inc xcoin) (dec ycoin))
+													 (smartretrPntData arr xcoin ycoin)
+													 (smartretrPntData arr (inc xcoin) ycoin)]
+												(= callingfrom :callfromleftbelow)
+													[(smartretrPntData arr (dec xcoin) (dec ycoin))
+													 (smartretrPntData arr xcoin (dec ycoin))
+													 (smartretrPntData arr (dec xcoin) ycoin)
+													 (smartretrPntData arr xcoin ycoin)]
+												)
+									)
+							]
+							
 							(->>(map #(get %1 :existence) neighbours) 
 							(map (make-fn not))
 							(apply (make-fn or))
-								)
-
-						 (apply (make-fn or) (map (make-fn not) (map #(get %1 :existence) neighbours) ))
-						 
-						)
-					
-					)
+								)))
+				false)
 						
 
 		post (cond 
-
 				(not edge)
 					(cond
 						(= pos :tl) (partial web-post-tl)
@@ -544,7 +549,6 @@
 						(= pos :tr) (partial web-post-tr)
 						(= pos :br) (partial web-post-br)
 						)
-
 				edge 
 					(cond
 						(= pos :tl) (partial web-post-edge-tl)
@@ -557,14 +561,8 @@
 		(attach 
 			[cpntP cpntV cpntA]
 			[[0 0 0] [0 0 1] 0]
-
 			(translate [xtrans ytrans 0] post)
-
-
-			)
-
-			)
-
+			))
 		)
 
 
@@ -602,7 +600,13 @@
 								(= plateorbase :plate)
 								 	(partial union)
 								(= plateorbase :base)
-									(partial hull)
+									(partial triangle-hulls)
+							)
+		buildedges 			(cond
+								(= plateorbase :plate)
+								 	true
+								(= plateorbase :base)
+									false
 							)
 
 		]
@@ -615,10 +619,10 @@
 				(for  [xcoin (range -1  arrXWid)]
 				(when (neigbhourtoexistence? arr xcoin ycoin :buildingrowsconnects)
 					(color [1 (rand) 1 1] (function
-						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingrows)
-						(putupapost arr xcoin       ycoin :br :callfromthisone :makingrows)
-						(putupapost arr (inc xcoin) ycoin :tl :callfromleft    :makingrows)
-						(putupapost arr (inc xcoin) ycoin :bl :callfromleft    :makingrows)
+						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingrows :buildedges)
+						(putupapost arr xcoin       ycoin :br :callfromthisone :makingrows :buildedges)
+						(putupapost arr (inc xcoin) ycoin :tl :callfromleft    :makingrows :buildedges)
+						(putupapost arr (inc xcoin) ycoin :bl :callfromleft    :makingrows :buildedges)
 						)
 					)
 						
@@ -631,10 +635,10 @@
 				(for [xcoin (range arrXWid)]
 				(when (neigbhourtoexistence? arr xcoin ycoin :buildingcolumnconnects) 
 					(color [(rand) 1 1 1] (function
-						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingcolumns)
-						(putupapost arr xcoin (inc ycoin) :br :callfrombelow   :makingcolumns)
-						(putupapost arr xcoin       ycoin :tl :callfromthisone :makingcolumns)
-						(putupapost arr xcoin (inc ycoin) :bl :callfrombelow   :makingcolumns)
+						(putupapost arr xcoin       ycoin :tr :callfromthisone :makingcolumns :buildedges)
+						(putupapost arr xcoin (inc ycoin) :br :callfrombelow   :makingcolumns :buildedges)
+						(putupapost arr xcoin       ycoin :tl :callfromthisone :makingcolumns :buildedges)
+						(putupapost arr xcoin (inc ycoin) :bl :callfrombelow   :makingcolumns :buildedges)
 						)
 					)
 					))))
@@ -645,10 +649,10 @@
 				(for [xcoin (range -1 arrXWid)]
 				(when (neigbhourtoexistence? arr xcoin ycoin :buildingdiagonalsconnects)
 					(color [1 1 (rand) 1] (function
-						(putupapost arr xcoin       ycoin       :tr :callfromthisone :makingdiag)
-						(putupapost arr xcoin       (inc ycoin) :br :callfrombelow   :makingdiag)
-						(putupapost arr (inc xcoin) ycoin       :tl :callfromleft    :makingdiag)
-						(putupapost arr (inc xcoin) (inc ycoin) :bl :callfromleftbelow :makingdiag)
+						(putupapost arr xcoin       ycoin       :tr :callfromthisone :makingdiag :buildedges)
+						(putupapost arr xcoin       (inc ycoin) :br :callfrombelow   :makingdiag :buildedges)
+						(putupapost arr (inc xcoin) ycoin       :tl :callfromleft    :makingdiag :buildedges)
+						(putupapost arr (inc xcoin) (inc ycoin) :bl :callfromleftbelow :makingdiag :buildedges)
 						)
 					)
 
@@ -765,7 +769,7 @@
 				newPos 		[
 							(cpntP 0) 
 							(cpntP 1) 
-							(* (fxy (* (cpntP 0) xmulti) (* (cpntP 1) ymulti)) zmulti) ]
+							(+ (cpntP 2) (* (fxy (* (cpntP 0) xmulti) (* (cpntP 1) ymulti)) zmulti)) ]
 
 
 				newVec 		[
@@ -854,17 +858,15 @@
 
 (defn curvexaxisy [arr]
 	(let [
-		arguments [  arr
-					(partial #(+ (* (expt (abs %1) 2) 0.005) (* %2 0)))
+		arguments [arr (partial #(* (+ (* (expt %1 2) 0.25) ( expt %2 2) ) 0.008))
 
-
-					(partial #(+ (*  %1 2 0.005) (* %2 0)))
-					(partial #(* %2 %1 0) )
+					
+					(partial #(+ (* %1 2 0.008 0.25)  (* %2 0) ))
+					(partial #(+ (* %1 2 0.008)     (* %2 0) ))	
 					
 					1
 					1
-					1]
-		]
+					1 ]]
 
 	(apply apply3dequation arguments)
 
@@ -886,11 +888,11 @@
 (defn shouldthesekeysexist?youbethejudge [arr]
 	(let [existencearray
 					 [
-					[false true true true true true true true] 
-					[false true true false true true true true] 
-					[false true false false false true false false] 
-					[true false true false true true true true] 
-					[true true true false true true true true] 
+					[true true true true true true true true] 
+					[true true true true true true true true] 
+					[true true true true true true true false] 
+					[true true true true true true true false] 
+					[true true true true true true true false] 
 
 					] ]
 		(vec (for [ycoin (range arrYLen)]
@@ -906,7 +908,10 @@
 	"these are the functions that rewrite the array"
 	(-> 
 		(centrearray arr)
-		;(moveonXYplane 0 0 -100) ;thread this one into others
+		(moveonXYplane -2 0 -6 :row 3)
+		(moveonXYplane 0 0 -4 :row 4)
+		(moveonXYplane 0 0 +0 :row 5)
+		(moveonXYplane 0 0 +2 :row 6)
 		
 		(curvexaxisy)
 		;(curvexaxisx)
@@ -924,8 +929,8 @@
 		;(putsquareinarr arr)
 
 		(makeconnectors arr :plate)
-		;(translate [0 0 -30] (makeconnectors arr :base))
-		(showkeycaps arr)
+		(translate [0 0 -30] (makeconnectors arr :base))
+		;(showkeycaps arr)
 		(showconnectors arr)
 		)
 	)
@@ -940,4 +945,4 @@
 	)
 
 (spit "things/post-demo.scad"
-      (write-scad (buildarray )) :append true)
+      (write-scad (rotate 0.3 [1 0 0] (buildarray ))) :append true)
