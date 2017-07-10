@@ -882,27 +882,46 @@
 		
 
 		)
-
 	)
 
 (defn shouldthesekeysexist?youbethejudge [arr]
 	(let [existencearray
 					 [
+					[false true true true true true true true] 
+					[false true true true true true true true] 
+					[false true true true true true true true] 
 					[true true true true true true true true] 
-					[true true true true true true true true] 
-					[true true true true true true true false] 
-					[true true true true true true true false] 
-					[true true true true true true true false] 
+					[true true true true true true true true] ;as seem from origin looking in pos x, pos y
 
 					] ]
 		(vec (for [ycoin (range arrYLen)]
 			(vec (for [xcoin (range arrXWid)]
-				(assoc (retr arr xcoin ycoin) :existence (get-in existencearray [ycoin (- (dec arrXWid) xcoin)]))
-
-
+				(assoc (retr arr xcoin ycoin) :existence (get-in existencearray [(- (dec arrYLen) ycoin) xcoin]))
 		)))))
 	)
 
+(defn alignkeys [arr & more]
+	(let [
+		vecofkeys 		(more 0)
+		anchorkey		(retr arr ((vecofkeys 0) 0) ((vecofkeys 0) 1))
+		anchkeypos		(anchorkey :cpntPos)
+		anchkeyvec		(anchorkey :cpntVec)
+		anchkeyang		(anchorkey :cpntAng)
+
+		u 				(unitv anchkeyvec)
+		a 				(u 0)
+		b 				(u 1)
+		c 				(u 2)
+		d 				(modofvec [0 b c])
+
+		ConD 			(/ c d)
+		BonD 			(/ b d)
+		
+
+
+		])
+
+	)
 
 (defn transformationFunctions [arr & more]
 	"these are the functions that rewrite the array"
@@ -914,6 +933,7 @@
 		(moveonXYplane 0 0 +2 :row 6)
 		
 		(curvexaxisy)
+		;(alignkeys [[0 0] [1 0] :ontheleft])
 		;(curvexaxisx)
 		(shouldthesekeysexist?youbethejudge)
 
