@@ -204,11 +204,11 @@ With the bits of the acrylic that were left over from the middle layers and some
 ##### Wiring
 I would first start by wiring the two halves together. This is the wiring for serial:
 
-![serialwiring](http://qmk.fm/lets_split/serial_wiring.png)
+![serialwiring](http://qmk.fm/keyboards/lets_split/serial_wiring.png)
 
 And this is the wiring for I2C:
 
-![i2cwiring](http://qmk.fm/lets_split/i2c_wiring.png)
+![i2cwiring](http://qmk.fm/keyboards/lets_split/i2c_wiring.png)
 
 You wire these wires to the pins on your jack and use the identical pins on the jack of the other half.
 
