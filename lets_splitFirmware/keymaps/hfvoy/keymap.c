@@ -155,26 +155,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
         } else {
 			return MACRO( D(LCTL), T(V), U(LCTL), END  );
         };
-	case 3: // M(3)
-		if (record->event.pressed) {
-			SEND_STRING("Hal Frigaard");
-		};
-		return false;
-	case 5: // M(5)
-		if (record->event.pressed) {
-			SEND_STRING("hal.frig@gmail.com");
-		};
-		return false;
-	case 7: // M(7)
-		if (record->event.pressed) {
-			SEND_STRING("20 Medway St, Fullarton 5063, Adelaide");
-		};
-		return false;
-	case 8: // M(8)
-		if (record->event.pressed) {
-			SEND_STRING("0421367071");
-		};
-		return false;
+	
 	case 9: // M(9)
         return MACRO(D(LALT),D(F4),U(F4),U(LALT), END);
 	case 11:
